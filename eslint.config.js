@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from "eslint-plugin-storybook";
+
 import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -11,14 +14,16 @@ import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
   globalIgnores(["dist", "build", "public", "node_modules"]),
+
+  // 1. 기존 extends 배열에 있던 추천 설정들을 바깥 배열로 빼서 적용합니다.
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  reactHooks.configs.flat.recommended,
+  reactRefresh.configs.vite,
+
+  // 2. 내가 추가할 커스텀 설정
   {
     files: ["**/*.{ts,tsx}"],
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -29,8 +34,7 @@ export default defineConfig([
       },
     },
     plugins: {
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
+      // ⚠️ react-hooks와 react-refresh는 위에서 불러온 설정에 이미 포함되어 있으므로 선언을 제거했습니다.
       react: react,
       import: importPlugin,
       "jsx-a11y": jsxA11y,
@@ -76,5 +80,8 @@ export default defineConfig([
       ],
     },
   },
+
+  // Prettier와 Storybook 설정도 바깥에 적용
   prettierConfig,
+  ...storybook.configs["flat/recommended"],
 ]);
