@@ -108,7 +108,7 @@ export default function RecentRecordCard({ data }: RecentRecordCardProps) {
             className="ml-0.5 text-[var(--text-subtitle-05)] font-[var(--text-subtitle-05--font-weight)]"
             style={{ color: themeStyles.point }}
           >
-            %
+            점
           </span>
         </div>
       </div>
