@@ -7,7 +7,7 @@ interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   rightElement?: ReactNode;
 }
 
-const TextInput = ({
+export const TextInput = ({
   label,
   id,
   required,
