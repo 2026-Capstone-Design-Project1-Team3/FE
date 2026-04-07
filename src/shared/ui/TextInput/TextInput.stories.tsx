@@ -31,7 +31,6 @@ const meta = {
       description:
         "필수 입력 여부를 결정합니다. true일 경우 라벨 옆에 빨간색 * 기호가 표시됩니다.",
     },
-    // ReactNode는 컨트롤 패널에서 조작하기 어려우므로 숨기거나 설명을 추가해줍니다.
     rightElement: {
       control: false,
       description:
@@ -54,21 +53,19 @@ export const Required: Story = {
   },
 };
 
-// 💡 새로 추가된 스토리! 우측 아이콘(rightElement) 테스트용
 export const WithRightElement: Story = {
   args: {
     id: "icon-input",
     label: "비밀번호",
     placeholder: "비밀번호를 입력해주세요.",
     required: true,
-    type: "password", // 비밀번호 타입 적용
+    type: "password",
     rightElement: (
       <button
         type="button"
         className="text-gray-400 hover:text-gray-600 transition-colors px-1"
         onClick={() => alert("아이콘 클릭 작동!")}
       >
-        {/* 🚨 나중에 여기에 <Eye /> 같은 루시드 아이콘을 넣으시면 됩니다! */}
         👁️
       </button>
     ),
