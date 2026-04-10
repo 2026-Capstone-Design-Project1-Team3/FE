@@ -12,7 +12,7 @@ export const StatsSection = ({ records }: StateSectionProps) => {
   const stats = records && records.length > 0 ? statsCalc(records) : null;
 
   return (
-    <div className="flex flex-col  gap-1 px-40 py-20 bg-gray-100">
+    <div className="flex flex-col  gap-1 px-50 py-20 bg-gray-100">
       <header className="pb-5 font-semibold text-xl w-20">최근 통계</header>
 
       <section className="flex justify-center items-center sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6 py-20 w-full">
