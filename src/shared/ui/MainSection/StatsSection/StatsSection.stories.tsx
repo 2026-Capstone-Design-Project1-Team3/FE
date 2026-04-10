@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatsSection } from "./StatsSection";
 
 const meta: Meta<typeof StatsSection> = {
-  title: "Components/Sections/StatsSection",
+  title: "UI/MainSection/StatsSection",
   component: StatsSection,
   parameters: {
     layout: "fullscreen",
