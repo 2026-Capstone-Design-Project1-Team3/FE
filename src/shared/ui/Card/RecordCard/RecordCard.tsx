@@ -9,7 +9,7 @@ type RecordCardVariant = "interview" | "presentation";
 const buttonBaseClass =
   "px-4 py-2 rounded-lg text-sm text-white font-medium  bg-gray-600  transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
 
-const varientConfigMap: Record<
+const variantConfigMap: Record<
   RecordCardVariant,
   { Icon: LucideIcon; iconBg: string }
 > = {
@@ -24,28 +24,31 @@ const varientConfigMap: Record<
 };
 
 export interface RecordCardProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  id: string;
+  folderId: string;
   variant: RecordCardVariant;
   title: string;
-  button: string;
-  date: string;
+  description: string;
+  createAt: string;
 }
 
 export const RecordCard = ({
-  id,
+  folderId,
   variant,
   title,
-  date,
-  button,
+  description,
+  createAt,
+  children,
   disabled,
+  className,
 }: RecordCardProps) => {
-  const { Icon, iconBg } = varientConfigMap[variant];
+  const { Icon, iconBg } = variantConfigMap[variant];
   return (
     <section
-      id={id}
+      id={folderId}
       className={cn(
         "flex items-center gap-4 p-4 mb-3",
         "bg-white border border-gray-100 rounded-2xl shadow-sm",
+        className,
       )}
     >
       <div className={cn("p-3 rounded-xl", iconBg)}>
@@ -55,13 +58,16 @@ export const RecordCard = ({
         <span className="font-semibold text-gray-900 line-clamp-1">
           {title}
         </span>
-        <span className="text-sm text-gray-500 line-clamp-1">{date}</span>
+        <span className="text-xs text-gray-900 line-clamp-1">
+          {description}
+        </span>
+        <span className="text-sm text-gray-500 line-clamp-1">{createAt}</span>
       </div>
       <button
         disabled={disabled}
         className={cn(buttonBaseClass, "line-clamp-1 max-w-30")}
       >
-        {button}
+        {children}
       </button>
     </section>
   );
