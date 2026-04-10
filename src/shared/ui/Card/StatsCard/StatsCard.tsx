@@ -18,16 +18,21 @@ export const StatsCard = ({
   return (
     <section
       className={cn(
-        "flex flex-col gap-2 p-6 rounded-2xl border bg-white shadow-sm min-w-40 max-w-70",
+        "flex flex-col gap-1.5 p-6 rounded-2xl border border-slate-100 bg-white shadow-sm min-w-40 max-w-70",
+        className,
         className,
       )}
     >
-      <h3 className="text-sm font-medium  tracking-tight">{title}</h3>
+      <h3 className="text-sm font-medium  tracking-tight ">{title}</h3>
       <div className="flex items-baseline gap-1">
-        <span className="text-3xl font-bold tracking-tight">{score}</span>
+        <span className="text-3xl font-bold tracking-tight text-success-01">
+          {score}
+        </span>
         <span className="text-sm font-medium ">{unit}</span>
       </div>
-      {description && <p className="text-xs  mt-1">{description}</p>}
+      {description && (
+        <p className="text-xs  mt-1 text-gray-500">{description}</p>
+      )}
     </section>
   );
 };
