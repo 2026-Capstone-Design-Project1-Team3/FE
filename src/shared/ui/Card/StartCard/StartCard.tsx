@@ -25,6 +25,7 @@ export interface StartCardProps {
   title: string;
   description: string;
   buttonText: string;
+  className?: string;
 }
 
 export const StartCard = ({
@@ -32,13 +33,15 @@ export const StartCard = ({
   title,
   description,
   buttonText,
+  className,
 }: StartCardProps) => {
   const { Icon, iconColor, buttonHover } = variantConfigMap[variant];
   return (
     <section
       className={cn(
-        "flex flex-col items-center gap-10 p-10 w-80",
+        "flex flex-col shrink-0 items-center gap-10 p-10 w-80",
         "bg-white border border-gray-100 rounded-2xl shadow-sm",
+        className,
       )}
     >
       <div>
