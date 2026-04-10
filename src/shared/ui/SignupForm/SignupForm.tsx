@@ -2,6 +2,7 @@ import { type ChangeEvent, type FormEvent, useState } from "react";
 
 import { ChevronLeft, Eye, EyeClosed } from "lucide-react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/shared/ui/Button/Button";
 import { CheckButton } from "@/shared/ui/CheckButton/CheckButton";
@@ -14,6 +15,7 @@ const NAME_REGEX = /^[가-힣]{2,10}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const SignupForm = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState<1 | 2>(1);
 
   const [userId, setUserId] = useState("");
@@ -53,6 +55,7 @@ export const SignupForm = () => {
     e.preventDefault();
     console.info("회원가입 완료!", { userId, password, userName, userEmail });
     toast.success("회원가입이 완료되었습니다.");
+    navigate("/");
   };
 
   const handleCheckIdDuplication = () => {
@@ -68,7 +71,8 @@ export const SignupForm = () => {
 
   const handleGoToLogin = () => {
     console.info("로그인하러 가기");
-    toast("로그인하러 가기");
+    toast("로그인 페이지로 이동");
+    navigate("/login");
   };
 
   const getIdMessageInfo = () => {
