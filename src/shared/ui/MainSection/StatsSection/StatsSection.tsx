@@ -13,7 +13,7 @@ export const StatsSection = ({ records }: StateSectionProps) => {
 
   return (
     <div className="flex flex-col  gap-1 px-50 py-20 bg-gray-100">
-      <header className="pb-5 font-semibold text-xl w-20">최근 통계</header>
+      <header className="pb-5 text-subtitle-01 w-20">최근 통계</header>
 
       <section className="flex justify-center items-center sm:grid-cols-2 lg:grid-cols-3 gap-5 p-6 py-20 w-full">
         <StatsCard

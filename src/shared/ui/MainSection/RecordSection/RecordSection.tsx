@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { MOCK_RECORDS } from "@/mocks/recordData";
 import {
   RecordCard,
   type RecordCardProps,
@@ -9,7 +10,9 @@ interface RecordSectionProps {
   initialData?: RecordCardProps[];
 }
 
-export const RecordSection = ({ initialData = [] }: RecordSectionProps) => {
+export const RecordSection = ({
+  initialData = MOCK_RECORDS,
+}: RecordSectionProps) => {
   const [IsUploading, setIsUploading] = useState(false);
   const [records, setRecords] = useState<RecordCardProps[]>(initialData);
 
@@ -24,7 +27,7 @@ export const RecordSection = ({ initialData = [] }: RecordSectionProps) => {
 
   return (
     <section className="flex flex-col gap-1 px-50 py-20 bg-white w-full min-h-120">
-      <header className="w-20 pb-5 font-semibold text-xl ">최근 기록</header>
+      <header className="w-20 pb-5 text-subtitle-01 ">최근 기록</header>
       {records.length > 0 ? (
         records.map((record) => (
           <RecordCard

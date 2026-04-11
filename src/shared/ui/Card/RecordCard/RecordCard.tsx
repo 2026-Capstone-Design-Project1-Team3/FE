@@ -7,7 +7,7 @@ import { cn } from "@/utils/cn";
 type RecordCardVariant = "interview" | "presentation";
 
 const buttonBaseClass =
-  "px-4 py-2 rounded-lg text-sm text-white font-medium  bg-gray-600  transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
+  "px-4 py-2 rounded-lg text-caption-01 text-white  bg-gray-600  transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
 
 const variantConfigMap: Record<
   RecordCardVariant,
@@ -55,13 +55,15 @@ export const RecordCard = ({
         <Icon className="w-5 h-5 text-gray-700" />
       </div>
       <div className="flex flex-col flex-1">
-        <span className="font-semibold text-gray-900 line-clamp-1">
+        <span className="text-subtitle-03 text-gray-900 line-clamp-1">
           {title}
         </span>
-        <span className="text-xs text-gray-900 line-clamp-1">
+        <span className="text-body-03 text-gray-900 line-clamp-1">
           {description}
         </span>
-        <span className="text-sm text-gray-500 line-clamp-1">{createAt}</span>
+        <span className="text-caption-01 text-gray-500 line-clamp-1">
+          {createAt}
+        </span>
       </div>
       <button
         disabled={disabled}
