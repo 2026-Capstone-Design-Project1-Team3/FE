@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { StateCard } from "./StateCard";
+import { StatsCard } from "./StatsCard";
 
-const meta: Meta<typeof StateCard> = {
-  title: "UI/StateCard",
-  component: StateCard,
+const meta: Meta<typeof StatsCard> = {
+  title: "UI/StatsCard",
+  component: StatsCard,
   tags: ["autodocs"],
   argTypes: {
     score: {
@@ -19,7 +19,7 @@ const meta: Meta<typeof StateCard> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof StateCard>;
+type Story = StoryObj<typeof StatsCard>;
 
 export const Default: Story = {
   args: {
@@ -51,14 +51,14 @@ export const EdgeCase: Story = {
 export const GridExample: Story = {
   render: () => (
     <div className="grid grid-cols-3 gap-4 p-4">
-      <StateCard title="사용자 수" score={120} unit="명" />
-      <StateCard
+      <StatsCard title="사용자 수" score={120} unit="명" />
+      <StatsCard
         title="매출 성장"
         score={15.4}
         unit="%"
         description="전월 대비"
       />
-      <StateCard
+      <StatsCard
         title="이탈률"
         score={2.1}
         unit="%"

@@ -2,10 +2,10 @@ import { Mic, Users, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 
-type StartCardType = "interview" | "presentation";
+type StartCardVariant = "interview" | "presentation";
 
-const typeConfigMap: Record<
-  StartCardType,
+const variantConfigMap: Record<
+  StartCardVariant,
   { Icon: LucideIcon; iconColor: string; buttonHover: string }
 > = {
   interview: {
@@ -21,24 +21,27 @@ const typeConfigMap: Record<
 };
 
 export interface StartCardProps {
-  type: StartCardType;
+  variant: StartCardVariant;
   title: string;
   description: string;
   buttonText: string;
+  className?: string;
 }
 
 export const StartCard = ({
-  type,
+  variant,
   title,
   description,
   buttonText,
+  className,
 }: StartCardProps) => {
-  const { Icon, iconColor, buttonHover } = typeConfigMap[type];
+  const { Icon, iconColor, buttonHover } = variantConfigMap[variant];
   return (
     <section
       className={cn(
-        "flex flex-col items-center gap-10 p-10",
+        "flex flex-col shrink-0 items-center gap-10 p-10 w-80",
         "bg-white border border-gray-100 rounded-2xl shadow-sm",
+        className,
       )}
     >
       <div>
