@@ -1,51 +1,66 @@
 import { useEffect, useState } from "react";
 
+import { ChevronRight } from "lucide-react";
+
 import { MOCK_RECORDS } from "@/mocks/recordData";
 import {
-  RecordCard,
-  type RecordCardProps,
-} from "@/shared/ui/Card/RecordCard/RecordCard";
+  RecordTableRow,
+  type RecordTableRowProps,
+} from "@/shared/ui/MainSection/RecordSection/RecordTableRow";
 
 interface RecordSectionProps {
-  initialData?: RecordCardProps[];
+  initialData?: RecordTableRowProps[];
+  className?: string;
 }
+
+const theadClass = "py-3 text-body-01 text-gray-500";
 
 export const RecordSection = ({
   initialData = MOCK_RECORDS,
+  className,
 }: RecordSectionProps) => {
-  const [IsUploading, setIsUploading] = useState(false);
-  const [records, setRecords] = useState<RecordCardProps[]>(initialData);
-
-  //임시로 설정
-  useEffect(() => {
-    setIsUploading(false);
-  }, []);
+  const [records, setRecords] = useState<RecordTableRowProps[]>(initialData);
 
   useEffect(() => {
     setRecords(initialData);
   }, [initialData]);
 
   return (
-    <section className="flex flex-col gap-1 px-50 py-20 bg-white w-full min-h-120">
-      <header className="w-20 pb-5 text-subtitle-01 ">최근 기록</header>
-      {records.length > 0 ? (
-        records.map((record) => (
-          <RecordCard
-            folderId={record.folderId}
-            variant={record.variant}
-            title={record.title || "제목 없음"}
-            description={record.description || "상세 설명이 없습니다."}
-            createAt={record.createAt || "-"}
-            children={IsUploading ? "업로드 중" : "상세보기"}
-            disabled={IsUploading}
-            className="min-w-xl"
-          />
-        ))
-      ) : (
-        <div className="flex flex-1 items-center justify-center text-gray-400">
-          기록이 없습니다.
+    <section className={className}>
+      <div className="mb-4 flex justify-between">
+        <div>
+          <h2 className="text-head-03">최근 연습 기록</h2>
         </div>
-      )}
+
+        <button className="text-label-04 text-info-01 -mb-2 flex min-w-20 cursor-pointer items-center gap-1 transition-all hover:gap-2 hover:underline">
+          전체 보기
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      <table className="w-full border-b border-gray-400 text-left">
+        <thead className="border-b border-gray-400 tracking-wider">
+          <th className={theadClass}>제목</th>
+          <th className={theadClass}>유형</th>
+          <th className={theadClass}>날짜</th>
+        </thead>
+        <tbody className="divide-y divide-gray-300">
+          {records.length > 0 ? (
+            records.map((record) => (
+              <RecordTableRow
+                folderId={record.folderId}
+                variant={record.variant}
+                title={record.title || "제목 없음"}
+                createAt={record.createAt || "--"}
+              />
+            ))
+          ) : (
+            <td colSpan={3} className="py-40 text-center text-gray-400">
+              기록이 없습니다.
+            </td>
+          )}
+        </tbody>
+      </table>
     </section>
   );
 };
