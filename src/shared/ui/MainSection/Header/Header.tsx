@@ -1,56 +1,61 @@
-import React from "react";
+import type { FC } from "react";
 
-import { Bell, Settings, User } from "lucide-react";
+import {
+  Settings,
+  User,
+  LayoutDashboard,
+  ChartSpline,
+  SquareArrowUp,
+  Mic,
+  type LucideIcon,
+} from "lucide-react";
 
 export interface HeaderProps {
   logoText?: string;
-  onNotificationClick?: () => void;
-  onSettingsClick?: () => void;
-  onProfileClick?: () => void;
-  hasNewNotification?: boolean;
+  logoClass?: string;
+  userImage?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  logoText = "LOGO",
-  onNotificationClick,
-  onSettingsClick,
-  onProfileClick,
-  hasNewNotification = true,
-}) => {
-  return (
-    <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
-      <div className="text-head-03 cursor-pointer">
-        <a href="/">{logoText}</a>
-      </div>
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={onNotificationClick}
-          className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell size={24} />
-          {hasNewNotification && (
-            <span className="absolute top-2 right-2 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error-01 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-error-01"></span>
-            </span>
-          )}
-        </button>
+interface HeaderMenuProps {
+  Icon: LucideIcon;
+  Text?: string;
+}
 
-        <button
-          onClick={onSettingsClick}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Settings"
-        >
+export const HeaderMenu: FC<HeaderMenuProps> = (props) => {
+  const { Icon, Text } = props;
+
+  return (
+    <div className="hover:text-info-01 border-info-01 text-body-01 flex min-w-32 cursor-pointer items-center gap-4 p-3 hover:border-b">
+      <Icon size={24} />
+      <button className="cursor-pointer">{Text}</button>
+    </div>
+  );
+};
+
+export const Header: FC<HeaderProps> = (props) => {
+  const { logoText, logoClass, userImage } = props;
+  return (
+    <header className="sticky top-0 z-50 flex items-center justify-between border-b border-gray-200 bg-white px-15 py-4">
+      <div className="flex items-center gap-10">
+        <div className="text-head-03 flex cursor-pointer">
+          <a href="/" className={logoClass}>
+            {logoText}
+          </a>
+        </div>
+        <div className="flex justify-center">
+          <HeaderMenu Icon={LayoutDashboard} Text="대시보드" />
+          <HeaderMenu Icon={SquareArrowUp} Text="발표 연습" />
+          <HeaderMenu Icon={Mic} Text="면접 연습" />
+          <HeaderMenu Icon={ChartSpline} Text="리포트" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-5">
+        <button className="cursor-pointer text-gray-600 transition-transform hover:rotate-90">
           <Settings size={24} />
         </button>
-
-        <button
-          onClick={onProfileClick}
-          className="p-2 ml-1 text-gray-600 hover:bg-gray-100 rounded-full transition-colors border border-gray-100"
-          aria-label="My Page"
-        >
-          <User size={24} />
+        <button className="ml-1 cursor-pointer rounded-full border border-gray-600 p-2 text-gray-600 transition-colors hover:bg-gray-100">
+          {userImage ? <img src={userImage} /> : <User size={24} />}
         </button>
       </div>
     </header>
