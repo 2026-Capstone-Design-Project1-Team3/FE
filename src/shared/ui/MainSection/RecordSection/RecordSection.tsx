@@ -13,8 +13,6 @@ interface RecordSectionProps {
   className?: string;
 }
 
-const theadClass = "py-3 text-body-01 text-gray-500";
-
 export const RecordSection = ({
   initialData = MOCK_RECORDS,
   className,
@@ -32,35 +30,31 @@ export const RecordSection = ({
           <h2 className="text-head-03">최근 연습 기록</h2>
         </div>
 
-        <button className="text-label-04 text-info-01 -mb-2 flex min-w-20 cursor-pointer items-center gap-1 transition-all hover:gap-2 hover:underline">
+        <button className="text-label-04 -mb-2 flex min-w-20 cursor-pointer items-center gap-1 text-gray-400 transition-all hover:gap-2 hover:text-gray-800">
           전체 보기
           <ChevronRight size={16} />
         </button>
       </div>
-
-      <table className="w-full border-b border-gray-400 text-left">
-        <thead className="border-b border-gray-400 tracking-wider">
-          <th className={theadClass}>제목</th>
-          <th className={theadClass}>유형</th>
-          <th className={theadClass}>날짜</th>
-        </thead>
-        <tbody className="divide-y divide-gray-300">
-          {records.length > 0 ? (
-            records.map((record) => (
-              <RecordTableRow
-                folderId={record.folderId}
-                variant={record.variant}
-                title={record.title || "제목 없음"}
-                createAt={record.createAt || "--"}
-              />
-            ))
-          ) : (
-            <td colSpan={3} className="py-40 text-center text-gray-400">
-              기록이 없습니다.
-            </td>
-          )}
-        </tbody>
-      </table>
+      <div className="rounded-2xl border border-gray-300 bg-white">
+        <table className="w-full">
+          <tbody className="divide-y divide-gray-300">
+            {records.length > 0 ? (
+              records.map((record) => (
+                <RecordTableRow
+                  folderId={record.folderId}
+                  variant={record.variant}
+                  title={record.title || "제목 없음"}
+                  createAt={record.createAt || "--"}
+                />
+              ))
+            ) : (
+              <td colSpan={3} className="py-40 text-center text-gray-400">
+                기록이 없습니다.
+              </td>
+            )}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 };

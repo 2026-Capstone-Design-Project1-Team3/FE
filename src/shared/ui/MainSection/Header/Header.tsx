@@ -1,43 +1,53 @@
 import type { FC } from "react";
 
-import { Settings, User } from "lucide-react";
+import {
+  Settings,
+  User,
+  LayoutDashboard,
+  ChartSpline,
+  SquareArrowUp,
+  Mic,
+  type LucideIcon,
+} from "lucide-react";
 
 export interface HeaderProps {
   logoText?: string;
+  logoClass?: string;
   userImage?: string;
 }
-import { cn } from "@/utils/cn";
 
-const headerMenuClass = "min-w-30 group";
-const headerMenuHover = "hover:underline hover:text-info-01 cursor-pointer";
+interface HeaderMenuProps {
+  Icon: LucideIcon;
+  Text?: string;
+}
+
+export const HeaderMenu: FC<HeaderMenuProps> = (props) => {
+  const { Icon, Text } = props;
+
+  return (
+    <div className="hover:text-info-01 border-info-01 text-body-01 flex min-w-32 cursor-pointer items-center gap-4 p-3 hover:border-b">
+      <Icon size={24} />
+      <button className="cursor-pointer">{Text}</button>
+    </div>
+  );
+};
 
 export const Header: FC<HeaderProps> = (props) => {
-  const { logoText, userImage } = props;
+  const { logoText, logoClass, userImage } = props;
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-      <div className="text-head-03 flex cursor-pointer items-center">
-        <a href="/">{logoText}</a>
-      </div>
-      <div className="text-body-01 flex justify-center divide-x divide-gray-300 pr-10 pl-30">
-        <button className={cn(headerMenuClass, headerMenuHover)}>
-          대시보드
-        </button>
-
-        <div className={cn(headerMenuClass, "group flex justify-center")}>
-          <span className={cn(headerMenuHover, "group-hover:hidden")}>
-            연습하기
-          </span>
-          <div className="hidden items-center gap-4 group-hover:flex">
-            <button className={headerMenuHover}>면접</button>
-            <button className={headerMenuHover}>발표</button>
-          </div>
+    <header className="sticky top-0 z-50 flex items-center justify-between border-b border-gray-200 bg-white px-15 py-4">
+      <div className="flex items-center gap-10">
+        <div className="text-head-03 flex cursor-pointer">
+          <a href="/" className={logoClass}>
+            {logoText}
+          </a>
         </div>
-        <button className={cn(headerMenuClass, headerMenuHover)}>
-          성과분석
-        </button>
-        <button className={cn(headerMenuClass, headerMenuHover)}>
-          연습기록
-        </button>
+        <div className="flex justify-center">
+          <HeaderMenu Icon={LayoutDashboard} Text="대시보드" />
+          <HeaderMenu Icon={SquareArrowUp} Text="발표 연습" />
+          <HeaderMenu Icon={Mic} Text="면접 연습" />
+          <HeaderMenu Icon={ChartSpline} Text="리포트" />
+        </div>
       </div>
 
       <div className="flex items-center gap-5">

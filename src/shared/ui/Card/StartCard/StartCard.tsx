@@ -5,7 +5,7 @@ import { ArrowRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export interface StartCardProps {
-  bgImage?: string;
+  bgColor?: string;
   Icon: LucideIcon;
   IconClass?: string;
   title?: string;
@@ -17,7 +17,7 @@ export interface StartCardProps {
 
 export const StartCard: FC<StartCardProps> = (props) => {
   const {
-    bgImage,
+    bgColor,
     Icon,
     IconClass,
     title,
@@ -34,14 +34,11 @@ export const StartCard: FC<StartCardProps> = (props) => {
       )}
     >
       <div
-        className="absolute inset-0 z-0 opacity-30"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          maskImage: "linear-gradient(to left, black, transparent)",
-        }}
-      ></div>
+        className={cn(
+          "absolute -top-13 -right-13 h-32 w-32 rounded-bl-full transition-all group-hover:-top-10 group-hover:-right-10",
+          bgColor,
+        )}
+      />
       <div
         className={cn(
           "mb-6 flex h-14 w-14 items-center justify-center rounded-lg transition-transform group-hover:scale-110",

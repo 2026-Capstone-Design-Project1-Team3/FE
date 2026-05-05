@@ -3,9 +3,6 @@ import { Mic, Presentation, AlertCircle, MessagesSquare } from "lucide-react";
 
 import { StartCard } from "./StartCard";
 
-import InterviewImage from "@/assets/interview.png";
-import PresentationImage from "@/assets/presentation.png";
-
 const meta: Meta<typeof StartCard> = {
   title: "UI/StartCard",
   component: StartCard,
@@ -15,7 +12,6 @@ const meta: Meta<typeof StartCard> = {
     title: { control: "text" },
     description: { control: "text" },
     buttonText: { control: "text" },
-    bgImage: { control: "text" },
   },
   parameters: {
     backgrounds: {
@@ -35,7 +31,6 @@ export const InterviewCard: Story = {
     title: "AI 모의 면접",
     description: "실전 같은 면접 연습을 시작해보세요.",
     buttonText: "시작하기",
-    bgImage: InterviewImage,
   },
 };
 
@@ -46,7 +41,6 @@ export const PresentationCard: Story = {
     title: "발표 연습하기",
     description: "발표의 시선 처리와 발음을 교정해드립니다.",
     buttonText: "연습 시작",
-    bgImage: PresentationImage,
   },
 };
 
@@ -65,7 +59,6 @@ export const GridExample: Story = {
   render: () => (
     <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 p-6 md:grid-cols-2">
       <StartCard
-        bgImage={PresentationImage}
         Icon={Presentation}
         IconClass="bg-primary-600/50 text-primary-900"
         title="면접 연습"
@@ -76,7 +69,6 @@ export const GridExample: Story = {
         buttonClass="text-primary-800"
       />
       <StartCard
-        bgImage={InterviewImage}
         Icon={MessagesSquare}
         IconClass="bg-secondary-600/50 text-secondary-900"
         title="발표 연습"
