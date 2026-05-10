@@ -48,7 +48,7 @@ export const EyeCalibration: FC<EyeCalibrationProps> = (props) => {
         className="text-body-01 bg-secondary-900 hover:bg-secondary-800 border-secondary-900 hover:border-secondary-800 flex h-15 w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-5 text-white hover:border-2"
       >
         <Video size={24} />
-        촬영하기
+        {complete ? "재촬영하기" : "촬영하기"}
       </button>
     </section>
   );
