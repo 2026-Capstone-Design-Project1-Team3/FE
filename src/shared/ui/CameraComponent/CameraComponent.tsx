@@ -1,70 +1,76 @@
-import { type FC, useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 
 interface CameraComponentProps {
   onError?: (errorMessage: string | null) => void;
 }
 
-const CameraComponent: FC<CameraComponentProps> = (props) => {
-  const { onError } = props;
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export interface CameraHandle {
+  video: HTMLVideoElement | null;
+}
 
-  useEffect(() => {
-    const startCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 1280, height: 720 },
-          audio: false,
-        });
+const CameraComponent = forwardRef<CameraHandle, CameraComponentProps>(
+  (props, ref) => {
+    const { onError } = props;
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const streamRef = useRef<MediaStream | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-        streamRef.current = stream;
+    useImperativeHandle(ref, () => ({
+      video: videoRef.current,
+    }));
 
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+    useEffect(() => {
+      const startCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 1280, height: 720 },
+            audio: false,
+          });
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (err) {
+          const msg = "카메라 권한을 허용해주세요.";
+          console.error(err);
+          setError(msg);
+          onError?.(msg);
         }
-      } catch (err) {
-        const msg = "카메라 권한을 허용해주세요.";
-        console.error("카메라를 가져오는데 실패했습니다:", err);
-        setError(msg);
-        onError?.(msg);
-      }
-    };
+      };
 
-    startCamera();
+      startCamera();
 
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
-    };
-  }, [onError]);
+      return () => {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+        }
+      };
+    }, [onError]);
 
-  return (
-    <section className="p-4">
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative aspect-video w-full max-w-2xl overflow-hidden rounded-2xl bg-slate-950 shadow-xl">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="transition-filter h-full w-full object-cover grayscale-0 duration-500"
-          />
-
-          {/* 에러 오버레이: 글래스모피즘 스타일 적용 */}
-          {error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-              <p className="rounded-lg border border-red-500/50 bg-red-500/20 px-4 py-2 text-sm font-medium text-white">
-                {error}
-              </p>
-            </div>
-          )}
-        </div>
+    return (
+      <div className="relative overflow-hidden rounded-2xl bg-black">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="h-100 w-200 object-cover"
+        />
+        {error && (
+          <p className="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-center p-4">
+            {error}
+          </p>
+        )}
       </div>
-    </section>
-  );
-};
+    );
+  },
+);
 
+CameraComponent.displayName = "CameraComponent";
 export default CameraComponent;

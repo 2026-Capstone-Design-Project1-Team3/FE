@@ -15,7 +15,7 @@ export const UserHeader: FC<UserHeaderProps> = (props) => {
       <div className="flex items-center gap-5">
         <User
           size={64}
-          className="text-primary-900 min-w-16 rounded-full border-2 p-3"
+          className="text-primary-900 min-w-16 rounded-full border-3 p-3"
         />
         <span className="p-1">
           <h1 className="text-head-03">{userName || "사용자"}</h1>

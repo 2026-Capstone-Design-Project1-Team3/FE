@@ -1,4 +1,4 @@
-import { type FC, useEffect, useState } from "react";
+import { type FC, useEffect, useState, useCallback } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -15,16 +15,25 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
   const [complete, setComplete] = useState(false);
   const [hasError, setHasError] = useState(false);
   const navigation = useNavigate();
+
   const progress = ((sec - countdown) / sec) * 100;
+
+  const handleCameraError = useCallback((msg: string | null) => {
+    setHasError(!!msg);
+  }, []);
+
   useEffect(() => {
     if (!isActive) return;
+
     if (countdown === 0) {
       const timer = setTimeout(() => {
         setIsActive(false);
         setComplete(true);
       }, 800);
+
       return () => clearTimeout(timer);
     }
+
     const interval = setInterval(() => {
       setCountdown((prev) => prev - 1);
     }, 1000);
@@ -36,6 +45,7 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
     setCountdown(sec);
     setIsActive(true);
   };
+
   const handleGoToMyPage = () => {
     navigation("/mypage");
   };
@@ -48,7 +58,7 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
         </p>
       </div>
       <div className="relative mx-auto w-fit">
-        <CameraComponent onError={(msg) => setHasError(!!msg)} />
+        <CameraComponent onError={handleCameraError} />
         <div className="text-subtitle-05 absolute top-6 right-6 flex h-7 w-14 items-center justify-center rounded-lg bg-gray-700 text-white">
           0{countdown} sec
         </div>
@@ -93,7 +103,7 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
           <button
             onClick={handleStart}
             disabled={isActive || hasError}
-            className="border-secondary-900 bg-secondary-900 hover:border-secondary-800 hover:bg-secondary-800 cursor-pointer rounded-xl border-2 px-15 py-2 text-white"
+            className="border-secondary-900 bg-secondary-900 hover:border-secondary-800 hover:bg-secondary-800 cursor-pointer rounded-xl border-2 px-15 py-2 text-white disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
           >
             {hasError
               ? "권한 설정 필요"
