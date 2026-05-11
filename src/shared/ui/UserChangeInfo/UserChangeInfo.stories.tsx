@@ -24,13 +24,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {},
-};
-
-export const WithPreviousInfo: Story = {
   args: {
     prevName: "홍길동",
-    prevId: "kknu_student",
-    prevEmail: "knu_cse@knu.ac.kr",
+    userId: "knu_student",
+    userEmail: "knu_cse@knu.ac.kr",
   },
 };
