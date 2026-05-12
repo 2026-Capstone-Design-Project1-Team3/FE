@@ -1,7 +1,6 @@
 import type { FC } from "react";
 
 import { Footer } from "@/shared/ui/MainSection/Footer/Footer";
-import { Header } from "@/shared/ui/MainSection/Header/Header";
 import { RecordSection } from "@/shared/ui/MainSection/RecordSection/RecordSection";
 import { StartSection } from "@/shared/ui/MainSection/StartSection/StartSection";
 
@@ -12,8 +11,7 @@ const MainPage: FC<MainPageProps> = (props) => {
   const { username } = props;
   return (
     <div>
-      <Header logoText="Silent Mentor" logoClass="text-primary-900" />
-      <main className="bg-primary-900/5">
+      <main>
         <div className="mx-auto max-w-6xl p-8">
           <section className="py-10">
             <h1 className="text-head-01">
