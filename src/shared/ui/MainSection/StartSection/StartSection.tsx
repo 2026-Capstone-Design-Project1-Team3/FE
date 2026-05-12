@@ -1,7 +1,6 @@
 import type { FC } from "react";
 
 import { SquareArrowUp, Mic } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { StartCard } from "@/shared/ui/Card/StartCard/StartCard";
 
@@ -11,7 +10,6 @@ interface StartSectionProps {
 
 export const StartSection: FC<StartSectionProps> = (props) => {
   const { className } = props;
-  const navigate = useNavigate();
   return (
     <section className={className}>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -25,7 +23,6 @@ export const StartSection: FC<StartSectionProps> = (props) => {
           }
           buttonText="시작하기"
           buttonClass="text-primary-800"
-          onClick={() => navigate("/presentation/prepare")}
         />
         <StartCard
           bgColor="bg-secondary-900/20"
@@ -37,7 +34,6 @@ export const StartSection: FC<StartSectionProps> = (props) => {
           }
           buttonText="시작하기"
           buttonClass="text-secondary-800"
-          onClick={() => navigate("/interview/prepare")}
         />
       </div>
     </section>
