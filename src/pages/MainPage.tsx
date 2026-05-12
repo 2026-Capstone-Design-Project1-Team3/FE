@@ -1,6 +1,5 @@
 import type { FC } from "react";
 
-import { Footer } from "@/shared/ui/MainSection/Footer/Footer";
 import { RecordSection } from "@/shared/ui/MainSection/RecordSection/RecordSection";
 import { StartSection } from "@/shared/ui/MainSection/StartSection/StartSection";
 
@@ -25,7 +24,6 @@ const MainPage: FC<MainPageProps> = (props) => {
           <StartSection className="py-10" />
           <RecordSection className="py-10" />
         </div>
-        <Footer />
       </main>
     </div>
   );

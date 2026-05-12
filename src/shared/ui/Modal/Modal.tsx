@@ -44,7 +44,7 @@ export const Modal = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-94 flex flex-col text-center bg-background-light rounded-2xl p-6 shadow-xl"
+        className="w-full max-w-100 flex flex-col text-center bg-background-light rounded-2xl p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-subtitle-01 text-text-primary mb-6">{title}</h2>

@@ -14,7 +14,7 @@ export const EyeCalibration: FC<EyeCalibrationProps> = (props) => {
   const StatusIcon = complete ? CircleCheck : CircleAlert;
   const navigation = useNavigate();
   const handleGoToCalibration = () => {
-    navigation("/calibration");
+    navigation("/my/calibration");
   };
   return (
     <section className={className}>
