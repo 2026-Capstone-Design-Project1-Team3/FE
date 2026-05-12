@@ -9,25 +9,16 @@ const meta: Meta<typeof Header> = {
   parameters: {
     layout: "fullscreen",
   },
-  argTypes: {
-    logoText: {
-      description: "좌측 로고에 표시될 텍스트입니다.",
-      control: "text",
-    },
-  },
+  argTypes: {},
 };
 
 export default meta;
 type Story = StoryObj<typeof Header>;
 
 export const Default: Story = {
-  args: {
-    logoText: "MY APP",
-  },
+  args: {},
 };
 
 export const EdgeCase: Story = {
-  args: {
-    logoText: "MY AWESOME DASHBOARD SERVICE",
-  },
+  args: {},
 };
