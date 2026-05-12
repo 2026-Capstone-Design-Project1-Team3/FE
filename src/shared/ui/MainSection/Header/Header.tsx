@@ -55,9 +55,10 @@ export const Header: FC<HeaderProps> = (props) => {
   const isPresentationActive = location.pathname.startsWith("/presentation");
   const isInterviewActive = location.pathname.startsWith("/interview");
   const isReportActive = location.pathname.startsWith("/report");
+  const isMyActive = location.pathname.startsWith("/my");
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between border-b border-gray-200 bg-white px-15 py-4">
+    <header className="w-full sticky top-0 z-50 flex items-center justify-between border-b border-gray-200 bg-white px-15 py-4">
       <div className="flex items-center gap-10">
         <div className="text-head-03 flex cursor-pointer">
           <a href="/" className="text-primary-900">
@@ -96,8 +97,24 @@ export const Header: FC<HeaderProps> = (props) => {
         <button className="cursor-pointer text-gray-600 transition-transform hover:rotate-90">
           <Settings size={24} />
         </button>
-        <button className="ml-1 cursor-pointer rounded-full border border-gray-600 p-2 text-gray-600 transition-colors hover:bg-gray-100">
-          {userImage ? <img src={userImage} /> : <User size={24} />}
+        <button
+          onClick={() => navigate("/my")}
+          className={cn(
+            "ml-1 cursor-pointer rounded-full border p-2 transition-colors hover:bg-gray-100",
+            isMyActive
+              ? "border-primary-800 text-primary-800 bg-info-01/5"
+              : "border-gray-600 text-gray-600",
+          )}
+        >
+          {userImage ? (
+            <img
+              src={userImage}
+              className="w-6 h-6 rounded-full object-cover"
+              alt="User Profile"
+            />
+          ) : (
+            <User size={24} />
+          )}
         </button>
       </div>
     </header>
