@@ -3,7 +3,6 @@ import { type FC, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import CameraComponent from "@/shared/ui/CameraComponent/CameraComponent";
-import { Modal } from "@/shared/ui/Modal/Modal";
 
 export interface CalibrationPageProps {
   sec?: number;
@@ -15,9 +14,6 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
   const [isActive, setIsActive] = useState(false);
   const [complete, setComplete] = useState(false);
   const [hasError, setHasError] = useState(false);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const navigation = useNavigate();
 
   const progress = ((sec - countdown) / sec) * 100;
@@ -33,7 +29,6 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
       const timer = setTimeout(() => {
         setIsActive(false);
         setComplete(true);
-        setIsModalOpen(true);
       }, 800);
 
       return () => clearTimeout(timer);
@@ -52,14 +47,8 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
   };
 
   const handleGoToMyPage = () => {
-    navigation("/my");
+    navigation("/mypage");
   };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    navigation("/my");
-  };
-
   return (
     <main className="overflow-hidden">
       <div className="py-8 text-center">
@@ -107,14 +96,14 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
           <button
             onClick={handleGoToMyPage}
             disabled={isActive}
-            className="cursor-pointer w-48 rounded-xl border-2 border-gray-700 py-2 text-gray-700 hover:bg-gray-700 hover:text-white"
+            className="cursor-pointer rounded-xl border-2 border-gray-700 px-15 py-2 text-gray-700 hover:bg-gray-700 hover:text-white"
           >
             취소
           </button>
           <button
             onClick={handleStart}
             disabled={isActive || hasError}
-            className="border-secondary-900 bg-secondary-900 hover:border-secondary-800 hover:bg-secondary-800 cursor-pointer rounded-xl border-2 w-48 py-3 text-white disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
+            className="border-secondary-900 bg-secondary-900 hover:border-secondary-800 hover:bg-secondary-800 cursor-pointer rounded-xl border-2 px-15 py-2 text-white disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
           >
             {hasError
               ? "권한 설정 필요"
@@ -126,17 +115,6 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
           </button>
         </div>
       </section>
-      <Modal
-        isOpen={isModalOpen}
-        variant="single"
-        title="캘리브레이션 완료"
-        description={
-          "시선 추적 캘리브레이션 영상 촬영이\n성공적으로 완료되었습니다."
-        }
-        confirmText="확인"
-        onClose={handleModalClose}
-        onConfirm={handleModalClose}
-      />
     </main>
   );
 };

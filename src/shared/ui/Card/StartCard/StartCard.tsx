@@ -13,7 +13,6 @@ export interface StartCardProps {
   buttonText?: string;
   buttonClass?: string;
   className?: string;
-  onClick?: () => void;
 }
 
 export const StartCard: FC<StartCardProps> = (props) => {
@@ -26,11 +25,9 @@ export const StartCard: FC<StartCardProps> = (props) => {
     buttonText,
     buttonClass,
     className,
-    onClick,
   } = props;
   return (
     <section
-      onClick={onClick}
       className={cn(
         "group relative cursor-pointer overflow-hidden rounded-xl border border-gray-200 bg-white p-8 transition-all",
         className,
