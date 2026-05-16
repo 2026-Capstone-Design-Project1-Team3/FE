@@ -5,10 +5,14 @@ import { MainLayout } from "@/components/layouts/MainLayout";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
 import CalibrationPage from "@/pages/CalibrationPage";
+import { FolderDetailPage } from "@/pages/FolderDetailPage";
 import InterviewPreparePage from "@/pages/InterviewPreparePage";
+import { InterviewRecordPage } from "@/pages/InterviewRecordPage";
 import MainPage from "@/pages/MainPage";
 import MyPage from "@/pages/MyPage";
 import PresentationPreparePage from "@/pages/PresentationPreparePage";
+import { PresentationRecordPage } from "@/pages/PresentationRecordPage";
+import { ReportPage } from "@/pages/ReportPage";
 
 function App() {
   return (
@@ -20,12 +24,28 @@ function App() {
         <Route element={<MainLayout />}>
           <Route element={<MainPage />} path="/" />
           <Route element={<InterviewPreparePage />} path="/interview/prepare" />
+
           <Route
             element={<PresentationPreparePage />}
             path="/presentation/prepare"
           />
+
           <Route element={<MyPage />} path="/my" />
           <Route element={<CalibrationPage />} path="/my/calibration" />
+          <Route element={<ReportPage />} path="/report" />
+          <Route element={<InterviewRecordPage />} path="/report/interview" />
+          <Route
+            element={<PresentationRecordPage />}
+            path="/report/presentation"
+          />
+          <Route
+            element={<FolderDetailPage />}
+            path="/report/presentation/:folderId"
+          />
+          <Route
+            element={<FolderDetailPage />}
+            path="/report/interview/:folderId"
+          />
         </Route>
       </Routes>
     </BrowserRouter>
