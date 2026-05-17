@@ -28,7 +28,7 @@ const SPEED_DATA = {
 export const SpeedCard = ({ status }: SpeedCardProps) => {
   const data = SPEED_DATA[status];
   return (
-    <div className="w-120 rounded-2xl border border-border-default bg-background-light px-6 py-6 shadow-sm">
+    <div className="w-full rounded-2xl border border-border-default bg-background-light px-6 py-6 shadow-sm">
       <div className="mb-8 flex items-center justify-between">
         <span className="text-subtitle-01 text-text-secondary">
           말하기 속도
