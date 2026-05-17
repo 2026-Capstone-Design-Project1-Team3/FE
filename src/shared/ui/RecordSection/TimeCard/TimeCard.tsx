@@ -27,7 +27,7 @@ export const TimeCard = ({ isRunning, initialSeconds = 0 }: TimerCardProps) => {
   return (
     <div className="w-full min-w-60 rounded-2xl border border-border-default bg-background-light px-6 py-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-label-01 text-text-secondary">진행 시간</span>
+        <span className="text-subtitle-01 text-text-secondary">진행 시간</span>
         <Clock className="h-6 w-6 text-primary-900" strokeWidth={2.5} />
       </div>
       <div>
