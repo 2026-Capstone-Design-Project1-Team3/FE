@@ -7,7 +7,7 @@ import { FolderSelectModal, type FolderData } from "./FolderSelectModal";
 import { Button } from "@/shared/ui/Button/Button";
 
 const meta: Meta<typeof FolderSelectModal> = {
-  title: "UI/Modal/FolderSelectModal",
+  title: "UI/PrepareSection/FolderSelectModal",
   component: FolderSelectModal,
   parameters: {
     layout: "centered",
