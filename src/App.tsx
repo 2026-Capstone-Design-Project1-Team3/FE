@@ -5,6 +5,7 @@ import { MainLayout } from "@/components/layouts/MainLayout";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
 import CalibrationPage from "@/pages/CalibrationPage";
+import FolderDetailPage from "@/pages/FolderDetailPage";
 import InterviewPreparePage from "@/pages/InterviewPreparePage";
 import InterviewReportPage from "@/pages/InterviewReportPage";
 import InterviewResultPage from "@/pages/InterviewResultPage";
@@ -50,8 +51,6 @@ function App() {
             element={<FolderDetailPage />}
             path="/report/interview/:folderId"
           />
-          <Route element={<MyPage />} path="/my" />
-          <Route element={<CalibrationPage />} path="/my/calibration" />
         </Route>
       </Routes>
     </BrowserRouter>
