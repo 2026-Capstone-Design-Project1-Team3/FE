@@ -35,7 +35,7 @@ const MyPage = () => {
   };
 
   return (
-    <main>
+    <main className="flex justify-center">
       <div className="p-8 py-10">
         <section className="pb-10">
           <h1 className="text-head-01">마이페이지</h1>
@@ -43,7 +43,7 @@ const MyPage = () => {
             계정 정보 관리 및 캘리브레이션 설정을 최신 상태로 유지하세요.
           </p>
         </section>
-        <div className="flex flex-col gap-6 lg:flex-row">
+        <div className="max-w-300 flex flex-col gap-6 lg:flex-row">
           <section className="flex-4 overflow-hidden rounded-2xl border border-gray-300 bg-white">
             <UserHeader className="p-8" />
             <hr className="border-gray-300" />
@@ -53,7 +53,7 @@ const MyPage = () => {
               <ChangePassword className="pt-8" />
             </div>
             <div className="flex items-center justify-end gap-4 p-10">
-              <button className="border-primary-800 text-primary-800 hover:bg-primary-800 cursor-pointer rounded-xl border-2 px-7 py-2 hover:text-white">
+              <button className="border-primary-800 text-primary-800 hover:bg-primary-50 cursor-pointer rounded-xl border-2 px-7 py-2">
                 초기화
               </button>
               <button
@@ -71,14 +71,14 @@ const MyPage = () => {
         <div className="flex gap-4 pt-5">
           <button
             onClick={() => setActiveModal("logout")}
-            className="flex cursor-pointer gap-1 rounded-xl border-2 border-gray-600 px-6 py-2 text-gray-600 hover:bg-gray-600 hover:text-white"
+            className="flex cursor-pointer gap-2 rounded-xl border-2 bg-white border-gray-400 px-6 py-2 text-gray-600 hover:bg-gray-600 hover:text-white"
           >
             <LogOut size={24} />
             로그아웃
           </button>
           <button
             onClick={() => setActiveModal("delete")}
-            className="border-error-01/80 text-error-01/80 hover:bg-error-01/80 flex cursor-pointer gap-1 rounded-xl border-2 px-6 py-2 hover:text-white"
+            className="border-error-01/50 bg-white text-error-01/80 hover:bg-error-01/80 flex cursor-pointer gap-2 rounded-xl border-2 px-6 py-2 hover:text-white"
           >
             <UserMinus size={24} />
             회원 탈퇴
