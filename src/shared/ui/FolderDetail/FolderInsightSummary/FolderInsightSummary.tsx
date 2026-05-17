@@ -17,8 +17,8 @@ export const FolderInsightSummary: FC<FolderInsightSummaryProps> = ({
   insights,
 }) => {
   return (
-    <section className="border-secondary-900 bg-background-light rounded-xl border px-6 py-6">
-      <div className="mb-6 flex items-center justify-between gap-4">
+    <section className="border-secondary-900 bg-background-light min-h-70 min-w-0 flex-1 rounded-xl border px-6 py-6 sm:h-70">
+      <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Sparkles className="text-secondary-900 size-5" strokeWidth={2.25} />
           <h2 className="text-subtitle-02 text-secondary-900">
@@ -30,7 +30,7 @@ export const FolderInsightSummary: FC<FolderInsightSummaryProps> = ({
         </span>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2">
         {insights.map((insight) => (
           <article
             key={insight.label}

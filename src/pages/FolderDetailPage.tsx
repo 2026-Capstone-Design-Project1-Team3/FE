@@ -4,7 +4,7 @@ import { useLocation, useParams } from "react-router-dom";
 
 import { folderInsights, folderRecords } from "@/mocks/folderDetailData";
 import { mockRecords } from "@/mocks/mainRecordData";
-import { interviewRecords, presentationRecords } from "@/mocks/recordPageData";
+import { interviewRecords, presentationRecords } from "@/mocks/reportPageData";
 import { FolderInsightSummary } from "@/shared/ui/FolderDetail/FolderInsightSummary/FolderInsightSummary";
 import { FolderScoreCard } from "@/shared/ui/FolderDetail/FolderScoreCard/FolderScoreCard";
 import { RecordSection } from "@/shared/ui/MainSection/RecordSection/RecordSection";
@@ -87,7 +87,7 @@ export const FolderDetailPage = () => {
               폴더 인사이트 요약
             </h2>
 
-            <div className="grid gap-6">
+            <div className="flex flex-col gap-6 lg:flex-row">
               <FolderInsightSummary insights={folderInsights} />
               <FolderScoreCard title="평균 코칭 성과" score={90} delta="+5%" />
             </div>
