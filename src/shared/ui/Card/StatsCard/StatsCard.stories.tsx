@@ -1,6 +1,28 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { TrendingUp, Calendar, ChartColumn } from "lucide-react";
+import { Bar, BarChart, Line, LineChart, ResponsiveContainer } from "recharts";
 
 import { StatsCard } from "./StatsCard";
+
+const practiceCountData = [
+  { value: 18 },
+  { value: 22 },
+  { value: 21 },
+  { value: 27 },
+  { value: 24 },
+  { value: 6 },
+  { value: 58 },
+  { value: 25 },
+];
+
+const improvementData = [
+  { value: 12 },
+  { value: 22 },
+  { value: 18 },
+  { value: 34 },
+  { value: 40 },
+  { value: 52 },
+];
 
 const meta: Meta<typeof StatsCard> = {
   title: "UI/StatsCard",
@@ -9,7 +31,6 @@ const meta: Meta<typeof StatsCard> = {
   argTypes: {
     score: {
       control: { type: "number" },
-      description: "표시할 수치 데이터입니다.",
     },
     unit: {
       control: { type: "text" },
@@ -22,47 +43,60 @@ export default meta;
 type Story = StoryObj<typeof StatsCard>;
 
 export const Default: Story = {
-  args: {
-    title: "현재 달성률",
-    score: 75,
-    unit: "%",
-  },
-};
-
-export const WithDescription: Story = {
-  args: {
-    title: "종합 점수",
-    score: 98,
-    unit: "점",
-    description: "지난 분기 대비 12% 향상되었습니다.",
-  },
-};
-
-export const EdgeCase: Story = {
-  args: {
-    title: "매우 길어서 레이아웃을 위협하는 수준의 카드 제목 테스트입니다",
-    score: 99.9,
-    unit: "상태단위",
-    description:
-      "설명 텍스트 또한 매우 길게 작성하여 말줄임표 처리나 레이아웃 깨짐이 발생하는지 확인하기 위한 데이터입니다. 이 카드는 정상적으로 높이가 조절되어야 합니다.",
-  },
-};
-
-export const GridExample: Story = {
   render: () => (
-    <div className="grid grid-cols-3 gap-4 p-4">
-      <StatsCard title="사용자 수" score={120} unit="명" />
+    <div className="grid grid-cols-3 gap-6 bg-background-dark p-2">
       <StatsCard
-        title="매출 성장"
-        score={15.4}
-        unit="%"
-        description="전월 대비"
+        title="총 연습 횟수"
+        Icon={TrendingUp}
+        score={128}
+        gap="+12%"
+        className="h-52 max-w-none"
+        chart={
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={practiceCountData}>
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="var(--color-primary-900)"
+                strokeWidth={5}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        }
       />
       <StatsCard
-        title="이탈률"
-        score={2.1}
+        title="향상도"
+        Icon={ChartColumn}
+        score={32}
         unit="%"
-        className="border-blue-500"
+        gap="Top 3"
+        className="[&_p]:text-primary-800 h-52 max-w-none"
+        chart={
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={improvementData} barCategoryGap={4}>
+              <Bar
+                dataKey="value"
+                fill="var(--color-primary-900)"
+                radius={[2, 2, 0, 0]}
+                isAnimationActive={false}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        }
+      />
+      <StatsCard
+        title="성장률"
+        Icon={Calendar}
+        score={4}
+        unit="일"
+        gap="전월 대비"
+        className="h-52 max-w-none [&_p]:text-text-tertiary"
+        chart={
+          <div className="mt-auto h-2 rounded-full bg-primary-100">
+            <div className="h-full w-4/5 rounded-full bg-primary-900" />
+          </div>
+        }
       />
     </div>
   ),
