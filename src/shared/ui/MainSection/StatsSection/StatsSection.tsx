@@ -1,5 +1,6 @@
+import { useEffect, useState, type ComponentType } from "react";
+
 import { CalendarCheck, Target, Trophy } from "lucide-react";
-import { Bar, BarChart, Line, LineChart, ResponsiveContainer } from "recharts";
 
 import {
   getAverageScoreChartData,
@@ -18,11 +19,21 @@ import {
 import { mockRecords } from "@/mocks/mainRecordData";
 import { StatsCard } from "@/shared/ui/Card/StatsCard/StatsCard";
 
+interface ChartDataPoint {
+  value: number;
+}
+
+type StatsCharts = {
+  DailyPracticeCountChart: ComponentType<{ data: ChartDataPoint[] }>;
+  AverageScoreChart: ComponentType<{ data: ChartDataPoint[] }>;
+};
+
 interface StateSectionProps {
   records?: StatsRecord[];
 }
 
 export const StatsSection = ({ records = mockRecords }: StateSectionProps) => {
+  const [charts, setCharts] = useState<StatsCharts | null>(null);
   const range = getThirtyDayRange(getLatestRecordDate(records) ?? new Date());
   const practiceCountDiff = getRangePracticeCountDiff(records, range);
   const averageScoreDiff = getRangeAverageScoreDiff(records, range);
@@ -31,6 +42,26 @@ export const StatsSection = ({ records = mockRecords }: StateSectionProps) => {
 
   const formatSignedValue = (value: number) =>
     `${value >= 0 ? "+" : ""}${value}`;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    import("./StatsCharts").then((module) => {
+      if (!isMounted) return;
+
+      setCharts({
+        DailyPracticeCountChart: module.DailyPracticeCountChart,
+        AverageScoreChart: module.AverageScoreChart,
+      });
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const DailyPracticeCountChart = charts?.DailyPracticeCountChart;
+  const AverageScoreChart = charts?.AverageScoreChart;
 
   return (
     <div className="flex flex-col gap-1">
@@ -43,20 +74,12 @@ export const StatsSection = ({ records = mockRecords }: StateSectionProps) => {
           gap={`${formatSignedValue(practiceCountDiff)}회`}
           className=""
           chart={
-            <div className="mt-auto h-20 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
+            <div className="pointer-events-none mt-auto h-20 min-h-20 w-full min-w-0">
+              {DailyPracticeCountChart ? (
+                <DailyPracticeCountChart
                   data={getDailyPracticeCountChartData(records, range)}
-                  barCategoryGap={2}
-                >
-                  <Bar
-                    dataKey="value"
-                    fill="var(--color-primary-900)"
-                    radius={[2, 2, 0, 0]}
-                    isAnimationActive={false}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+                />
+              ) : null}
             </div>
           }
         />
@@ -68,18 +91,12 @@ export const StatsSection = ({ records = mockRecords }: StateSectionProps) => {
           gap={`${formatSignedValue(averageScoreDiff)}점`}
           className=""
           chart={
-            <div className="mt-auto h-20 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={getAverageScoreChartData(records, range)}>
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="var(--color-primary-900)"
-                    strokeWidth={3}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="pointer-events-none mt-auto h-20 min-h-20 w-full min-w-0">
+              {AverageScoreChart ? (
+                <AverageScoreChart
+                  data={getAverageScoreChartData(records, range)}
+                />
+              ) : null}
             </div>
           }
         />

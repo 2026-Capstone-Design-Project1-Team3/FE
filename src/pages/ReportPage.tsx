@@ -49,3 +49,5 @@ export const ReportPage = () => {
     </main>
   );
 };
+
+export default ReportPage;

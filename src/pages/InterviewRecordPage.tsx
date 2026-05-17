@@ -20,3 +20,5 @@ export const InterviewRecordPage = () => {
     </main>
   );
 };
+
+export default InterviewRecordPage;

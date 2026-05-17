@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 import { folderInsights, folderRecords } from "@/mocks/folderDetailData";
+import { mockRecords } from "@/mocks/mainRecordData";
+import { interviewRecords, presentationRecords } from "@/mocks/recordPageData";
 import { FolderInsightSummary } from "@/shared/ui/FolderDetail/FolderInsightSummary/FolderInsightSummary";
 import { FolderScoreCard } from "@/shared/ui/FolderDetail/FolderScoreCard/FolderScoreCard";
 import { RecordSection } from "@/shared/ui/MainSection/RecordSection/RecordSection";
@@ -17,13 +19,27 @@ interface FolderDetailLocationState {
 
 export const FolderDetailPage = () => {
   const { pathname, state } = useLocation();
+  const { folderId } = useParams();
   const routeVariant = pathname.includes("/report/interview/")
     ? "interview"
     : "presentation";
-  const { folderTitle = "폴더명", variant = routeVariant } =
+  const { folderTitle: stateFolderTitle, variant = routeVariant } =
     (state as FolderDetailLocationState | null) ?? { variant: routeVariant };
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(folderRecords.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(folderRecords.length / ITEMS_PER_PAGE),
+  );
+  const folderTitle =
+    stateFolderTitle ??
+    [
+      ...interviewRecords,
+      ...presentationRecords,
+      ...mockRecords,
+      ...folderRecords,
+    ].find((record) => record.folderId === folderId)?.title ??
+    folderId ??
+    "폴더명";
   const paginatedRecords = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
@@ -81,3 +97,5 @@ export const FolderDetailPage = () => {
     </main>
   );
 };
+
+export default FolderDetailPage;

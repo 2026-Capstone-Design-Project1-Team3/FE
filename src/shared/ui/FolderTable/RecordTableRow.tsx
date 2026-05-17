@@ -49,8 +49,6 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
   return (
     <tr
       key={folderId}
-      role="link"
-      tabIndex={0}
       aria-label={`${title || "제목 없음"} 폴더 상세 보기`}
       onClick={handleNavigate}
       className="group cursor-pointer outline-none"

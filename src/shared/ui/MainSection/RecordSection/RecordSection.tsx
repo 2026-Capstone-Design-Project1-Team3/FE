@@ -38,19 +38,17 @@ export const RecordSection = ({
               recentRecords.map((record) => (
                 <RecordTableRow
                   key={record.folderId}
-                  folderId={record.folderId}
-                  variant={record.variant}
+                  {...record}
                   title={record.title || "제목 없음"}
                   createAt={record.createAt || "--"}
                 />
               ))
             ) : (
-              <td
-                colSpan={3}
-                className="text-body-02 py-40 text-center text-text-deactivated"
-              >
-                기록이 없습니다.
-              </td>
+              <tr>
+                <td className="text-body-02 py-40 text-center text-text-deactivated">
+                  기록이 없습니다.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

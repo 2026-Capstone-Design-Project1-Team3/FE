@@ -21,3 +21,5 @@ export const PresentationRecordPage = () => {
     </main>
   );
 };
+
+export default PresentationRecordPage;

@@ -5,14 +5,14 @@ import { MainLayout } from "@/components/layouts/MainLayout";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
 import CalibrationPage from "@/pages/CalibrationPage";
-import { FolderDetailPage } from "@/pages/FolderDetailPage";
+import FolderDetailPage from "@/pages/FolderDetailPage";
 import InterviewPreparePage from "@/pages/InterviewPreparePage";
-import { InterviewRecordPage } from "@/pages/InterviewRecordPage";
+import InterviewRecordPage from "@/pages/InterviewRecordPage";
 import MainPage from "@/pages/MainPage";
 import MyPage from "@/pages/MyPage";
 import PresentationPreparePage from "@/pages/PresentationPreparePage";
-import { PresentationRecordPage } from "@/pages/PresentationRecordPage";
-import { ReportPage } from "@/pages/ReportPage";
+import PresentationRecordPage from "@/pages/PresentationRecordPage";
+import ReportPage from "@/pages/ReportPage";
 
 function App() {
   return (

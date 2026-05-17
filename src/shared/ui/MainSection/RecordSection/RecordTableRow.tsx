@@ -1,6 +1,7 @@
 import type { FC } from "react";
 
 import { type LucideIcon, MessagesSquare, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { cn } from "@/utils/cn";
 
@@ -50,26 +51,45 @@ export interface RecordTableRowProps extends RecordAnalysis {
 
 export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
   const { folderId, variant, title, createAt } = props;
+  const navigate = useNavigate();
   const { Icon, Color, Text } = variantConfigMap[variant];
+  const detailPath = `/report/${variant}/${folderId}`;
+
+  const handleReportClick = () => {
+    navigate(detailPath, {
+      state: {
+        folderTitle: title || "제목 없음",
+        variant,
+      },
+    });
+  };
+
   return (
     <tr key={folderId}>
-      <div className="flex items-center justify-between gap-2 p-5">
-        <div className="text-body-01 flex items-center gap-3 text-text-primary">
-          <span className={cn("rounded-lg p-4", Color)}>
-            <Icon size={21} />
-          </span>
-          <div>
-            <p className="text-body-01 line-clamp-1">{title}</p>
-            <span className="flex items-center gap-1 text-text-deactivated">
-              <p className={cn(Color, "bg-background-light")}>{Text}</p>
-              <p className="">•</p> <p className="text-body-03">{createAt}</p>
+      <td className="p-0">
+        <div className="flex items-center justify-between gap-2 p-5">
+          <div className="text-body-01 flex items-center gap-3 text-text-primary">
+            <span className={cn("rounded-lg p-4", Color)}>
+              <Icon size={21} />
             </span>
+            <div>
+              <p className="text-body-01 line-clamp-1">{title}</p>
+              <div className="flex items-center gap-1 text-text-deactivated">
+                <span className={cn(Color, "bg-background-light")}>{Text}</span>
+                <span>•</span>
+                <span className="text-body-03">{createAt}</span>
+              </div>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={handleReportClick}
+            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-700 hover:text-text-inverse"
+          >
+            리포트 보기
+          </button>
         </div>
-        <button className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-700 hover:text-text-inverse">
-          리포트 보기
-        </button>
-      </div>
+      </td>
     </tr>
   );
 };
