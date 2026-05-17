@@ -1,30 +1,10 @@
 import type { FC } from "react";
 
 import { type LucideIcon, MessagesSquare, FileText } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { cn } from "@/utils/cn";
 
 type RecordTableRowVariant = "interview" | "presentation";
-type RecordType = 0 | 1;
-
-interface RecordAnalysis {
-  gazeScore?: number;
-  gazeDistribution?: {
-    screen: number;
-    camera: number;
-  };
-  fluencyLevel?: 0 | 1 | 2;
-  speedScore?: number;
-  speedDistribution?: {
-    fast: number;
-    optimal: number;
-    slow: number;
-  };
-  speedFeedback?: string;
-  finalScore?: number;
-  type?: RecordType;
-}
 
 const variantConfigMap: Record<
   RecordTableRowVariant,
@@ -32,17 +12,17 @@ const variantConfigMap: Record<
 > = {
   interview: {
     Icon: MessagesSquare,
-    Color: "text-primary-800 bg-primary-100",
+    Color: "text-primary-800 bg-primary-800/20",
     Text: "면접",
   },
   presentation: {
     Icon: FileText,
-    Color: "text-secondary-900 bg-secondary-100",
+    Color: "text-secondary-800 bg-secondary-800/20",
     Text: "발표",
   },
 };
 
-export interface RecordTableRowProps extends RecordAnalysis {
+export interface RecordTableRowProps {
   folderId: string;
   variant: RecordTableRowVariant;
   title?: string;
@@ -51,45 +31,26 @@ export interface RecordTableRowProps extends RecordAnalysis {
 
 export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
   const { folderId, variant, title, createAt } = props;
-  const navigate = useNavigate();
   const { Icon, Color, Text } = variantConfigMap[variant];
-  const detailPath = `/report/${variant}/${folderId}`;
-
-  const handleReportClick = () => {
-    navigate(detailPath, {
-      state: {
-        folderTitle: title || "제목 없음",
-        variant,
-      },
-    });
-  };
-
   return (
     <tr key={folderId}>
-      <td className="p-0">
-        <div className="flex items-center justify-between gap-2 p-5">
-          <div className="text-body-01 flex items-center gap-3 text-text-primary">
-            <span className={cn("rounded-lg p-4", Color)}>
-              <Icon size={21} />
+      <div className="flex items-center justify-between gap-2 p-5">
+        <div className="text-body-01 flex items-center gap-3 text-gray-900">
+          <span className={cn("rounded-lg p-4", Color)}>
+            <Icon size={21} />
+          </span>
+          <div>
+            <p className="text-body-01 line-clamp-1">{title}</p>
+            <span className="flex items-center gap-1 text-gray-400">
+              <p className={cn(Color, "bg-white")}>{Text}</p>
+              <p className="">•</p> <p className="text-body-03">{createAt}</p>
             </span>
-            <div>
-              <p className="text-body-01 line-clamp-1">{title}</p>
-              <div className="flex items-center gap-1 text-text-deactivated">
-                <span className={cn(Color, "bg-background-light")}>{Text}</span>
-                <span>•</span>
-                <span className="text-body-03">{createAt}</span>
-              </div>
-            </div>
           </div>
-          <button
-            type="button"
-            onClick={handleReportClick}
-            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-700 hover:text-text-inverse"
-          >
-            리포트 보기
-          </button>
         </div>
-      </td>
+        <button className="text-primary-700 border-primary-700 hover:bg-primary-700 min-w-25 cursor-pointer rounded-xl border p-2 hover:text-white">
+          리포트 보기
+        </button>
+      </div>
     </tr>
   );
 };

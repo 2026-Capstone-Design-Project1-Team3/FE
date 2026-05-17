@@ -1,48 +1,38 @@
-import type { ReactNode } from "react";
-
-import type { LucideIcon } from "lucide-react";
-
 import { cn } from "@/utils/cn";
 
 export interface StatsCardProps {
   title: string;
-  Icon: LucideIcon;
   score: number | string;
   unit?: string; // 단위: %, 점, 개 등
-  gap?: string;
-  chart?: ReactNode;
+  description?: string;
   className?: string;
 }
 
 export const StatsCard = ({
   title,
-  Icon,
   score,
   unit,
-  gap,
-  chart,
+  description,
   className,
 }: StatsCardProps) => {
   return (
     <section
       className={cn(
-        "flex min-h-52 min-w-80 flex-col gap-2 rounded-xl border border-border-default bg-background-light p-7 shadow-sm",
+        "flex flex-col gap-1.5 p-6 rounded-2xl border border-slate-100 bg-white shadow-sm min-w-40 max-w-70",
+        className,
         className,
       )}
     >
-      <span className="flex items-center justify-between">
-        <h3 className="text-body-03 text-text-tertiary">{title}</h3>
-        <Icon size={21} className="text-primary-800" />
-      </span>
-
-      <div className="flex items-baseline gap-2">
-        <h1 className="text-head-02 text-text-secondary">
+      <h3 className="text-sm font-medium  tracking-tight ">{title}</h3>
+      <div className="flex items-baseline gap-1">
+        <span className="text-3xl font-bold tracking-tight text-success-01">
           {score}
-          {unit}
-        </h1>
-        <p className="text-body-03 text-primary-800">{gap}</p>
+        </span>
+        <span className="text-sm font-medium ">{unit}</span>
       </div>
-      {chart}
+      {description && (
+        <p className="text-xs  mt-1 text-gray-500">{description}</p>
+      )}
     </section>
   );
 };
