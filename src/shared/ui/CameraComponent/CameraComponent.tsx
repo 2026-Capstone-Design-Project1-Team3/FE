@@ -6,8 +6,11 @@ import {
   forwardRef,
 } from "react";
 
+import { cn } from "@/utils/cn";
+
 interface CameraComponentProps {
   onError?: (errorMessage: string | null) => void;
+  className?: string;
 }
 
 export interface CameraHandle {
@@ -16,7 +19,7 @@ export interface CameraHandle {
 
 const CameraComponent = forwardRef<CameraHandle, CameraComponentProps>(
   (props, ref) => {
-    const { onError } = props;
+    const { onError, className } = props;
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -54,13 +57,18 @@ const CameraComponent = forwardRef<CameraHandle, CameraComponentProps>(
     }, [onError]);
 
     return (
-      <div className="relative overflow-hidden rounded-2xl bg-black">
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-2xl bg-black",
+          className,
+        )}
+      >
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className="h-100 w-200 object-cover"
+          className="h-full w-full object-contain"
         />
         {error && (
           <p className="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-center p-4">
