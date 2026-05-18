@@ -6,10 +6,12 @@ import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
 import CalibrationPage from "@/pages/CalibrationPage";
 import InterviewPreparePage from "@/pages/InterviewPreparePage";
+import InterviewRecordPage from "@/pages/InterviewRecordPage";
 import InterviewReportPage from "@/pages/InterviewReportPage";
 import MainPage from "@/pages/MainPage";
 import MyPage from "@/pages/MyPage";
 import PresentationPreparePage from "@/pages/PresentationPreparePage";
+import PresentationRecordPage from "@/pages/PresentationRecordPage";
 import PresentationReportPage from "@/pages/PresentationReportPage";
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
           <Route element={<MainPage />} path="/" />
           <Route element={<InterviewPreparePage />} path="/interview/prepare" />
           <Route element={<InterviewReportPage />} path="/interview/report" />
+          <Route element={<InterviewRecordPage />} path="/interview/record" />
           <Route
             element={<PresentationPreparePage />}
             path="/presentation/prepare"
@@ -30,6 +33,10 @@ function App() {
           <Route
             element={<PresentationReportPage />}
             path="/presentation/report"
+          />
+          <Route
+            element={<PresentationRecordPage />}
+            path="/presentation/record"
           />
           <Route element={<MyPage />} path="/my" />
           <Route element={<CalibrationPage />} path="/my/calibration" />
