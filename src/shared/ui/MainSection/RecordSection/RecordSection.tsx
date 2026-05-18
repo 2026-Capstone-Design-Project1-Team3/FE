@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { ChevronRight } from "lucide-react";
-
-import { MOCK_RECORDS } from "@/mocks/recordData";
+import { mockRecords } from "@/mocks/mainRecordData";
 import {
   RecordTableRow,
   type RecordTableRowProps,
@@ -10,14 +8,22 @@ import {
 
 interface RecordSectionProps {
   initialData?: RecordTableRowProps[];
+  filterVariant?: RecordTableRowProps["variant"];
+  count?: number;
   className?: string;
 }
 
 export const RecordSection = ({
-  initialData = MOCK_RECORDS,
+  initialData = mockRecords,
+  filterVariant,
+  count = 5,
   className,
 }: RecordSectionProps) => {
   const [records, setRecords] = useState<RecordTableRowProps[]>(initialData);
+  const filteredRecords = filterVariant
+    ? records.filter((record) => record.variant === filterVariant)
+    : records;
+  const recentRecords = filteredRecords.slice(0, count);
 
   useEffect(() => {
     setRecords(initialData);
@@ -25,32 +31,24 @@ export const RecordSection = ({
 
   return (
     <section className={className}>
-      <div className="mb-4 flex justify-between">
-        <div>
-          <h2 className="text-head-03">최근 연습 기록</h2>
-        </div>
-
-        <button className="text-label-04 -mb-2 flex min-w-20 cursor-pointer items-center gap-1 text-gray-400 transition-all hover:gap-2 hover:text-gray-800">
-          전체 보기
-          <ChevronRight size={16} />
-        </button>
-      </div>
-      <div className="rounded-2xl border border-gray-300 bg-white">
+      <div className="rounded-2xl border border-border-default bg-background-light">
         <table className="w-full">
-          <tbody className="divide-y divide-gray-300">
-            {records.length > 0 ? (
-              records.map((record) => (
+          <tbody className="divide-y divide-border-default">
+            {recentRecords.length > 0 ? (
+              recentRecords.map((record) => (
                 <RecordTableRow
-                  folderId={record.folderId}
-                  variant={record.variant}
+                  key={record.folderId}
+                  {...record}
                   title={record.title || "제목 없음"}
                   createAt={record.createAt || "--"}
                 />
               ))
             ) : (
-              <td colSpan={3} className="py-40 text-center text-gray-400">
-                기록이 없습니다.
-              </td>
+              <tr>
+                <td className="text-body-02 py-40 text-center text-text-deactivated">
+                  기록이 없습니다.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
