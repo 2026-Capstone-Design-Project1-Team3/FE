@@ -1,0 +1,207 @@
+import type { RecordTableRowProps } from "@/shared/ui/MainSection/RecordSection/RecordTableRow";
+
+type MockRecordInput = Pick<
+  RecordTableRowProps,
+  "folderId" | "variant" | "type" | "title" | "createAt"
+> & {
+  finalScore: number;
+};
+
+const createMockRecord = (record: MockRecordInput): RecordTableRowProps => ({
+  ...record,
+  gazeScore: Math.max(0, record.finalScore - 4),
+  gazeDistribution: {
+    screen: record.variant === "presentation" ? 52 : 34,
+    camera: record.variant === "presentation" ? 48 : 66,
+  },
+  fluencyLevel: record.finalScore >= 80 ? 2 : record.finalScore >= 70 ? 1 : 0,
+  speedScore: Math.max(0, record.finalScore - 2),
+  speedDistribution: {
+    fast: record.finalScore >= 82 ? 14 : 20,
+    optimal: record.finalScore >= 82 ? 76 : 64,
+    slow: record.finalScore >= 82 ? 10 : 16,
+  },
+  speedFeedback:
+    record.finalScore >= 80
+      ? "속도와 흐름이 안정적입니다."
+      : "중간 구간의 속도 조절을 더 연습하면 좋습니다.",
+});
+
+export const mockRecords: RecordTableRowProps[] = [
+  createMockRecord({
+    folderId: "folder-001",
+    variant: "interview",
+    type: 1,
+    title: "2026 상반기 토스 프론트엔드 면접",
+    createAt: "2026/03/28",
+    finalScore: 88,
+  }),
+  createMockRecord({
+    folderId: "folder-002",
+    variant: "presentation",
+    type: 0,
+    title: "신규 프로젝트 기획안 발표",
+    createAt: "2026/03/25",
+    finalScore: 85,
+  }),
+  createMockRecord({
+    folderId: "folder-017",
+    variant: "interview",
+    type: 1,
+    title: "토스 프론트엔드 심화 질문 연습",
+    createAt: "2026/03/25",
+    finalScore: 86,
+  }),
+  createMockRecord({
+    folderId: "folder-003",
+    variant: "interview",
+    type: 1,
+    title: "현대자동차 수시 채용 면접",
+    createAt: "2026/03/22",
+    finalScore: 84,
+  }),
+  createMockRecord({
+    folderId: "folder-018",
+    variant: "presentation",
+    type: 0,
+    title: "자동차 산업 트렌드 발표 연습",
+    createAt: "2026/03/22",
+    finalScore: 83,
+  }),
+  createMockRecord({
+    folderId: "folder-019",
+    variant: "interview",
+    type: 1,
+    title: "현대자동차 꼬리질문 대응 연습",
+    createAt: "2026/03/22",
+    finalScore: 87,
+  }),
+  createMockRecord({
+    folderId: "folder-004",
+    variant: "presentation",
+    type: 0,
+    title: "기술 세미나 - Tailwind CSS 활용법",
+    createAt: "2026/03/20",
+    finalScore: 82,
+  }),
+  createMockRecord({
+    folderId: "folder-005",
+    variant: "interview",
+    type: 1,
+    title: "네이버 클라우드 인턴 면접",
+    createAt: "2026/03/18",
+    finalScore: 80,
+  }),
+  createMockRecord({
+    folderId: "folder-020",
+    variant: "interview",
+    type: 1,
+    title: "네이버 클라우드 기술 질문 연습",
+    createAt: "2026/03/18",
+    finalScore: 81,
+  }),
+  createMockRecord({
+    folderId: "folder-006",
+    variant: "presentation",
+    type: 0,
+    title: "서비스 개선안 발표",
+    createAt: "2026/03/15",
+    finalScore: 78,
+  }),
+  createMockRecord({
+    folderId: "folder-007",
+    variant: "interview",
+    type: 1,
+    title: "카카오 엔터프라이즈 직무 면접",
+    createAt: "2026/03/12",
+    finalScore: 76,
+  }),
+  createMockRecord({
+    folderId: "folder-008",
+    variant: "presentation",
+    type: 0,
+    title: "캡스톤 중간 발표 리허설",
+    createAt: "2026/03/10",
+    finalScore: 74,
+  }),
+  createMockRecord({
+    folderId: "folder-021",
+    variant: "interview",
+    type: 1,
+    title: "캡스톤 예상 질의응답 연습",
+    createAt: "2026/03/10",
+    finalScore: 77,
+  }),
+  createMockRecord({
+    folderId: "folder-022",
+    variant: "presentation",
+    type: 0,
+    title: "캡스톤 발표 시간 조절 연습",
+    createAt: "2026/03/10",
+    finalScore: 75,
+  }),
+  createMockRecord({
+    folderId: "folder-009",
+    variant: "interview",
+    type: 1,
+    title: "스타트업 프론트엔드 면접",
+    createAt: "2026/03/07",
+    finalScore: 71,
+  }),
+  createMockRecord({
+    folderId: "folder-010",
+    variant: "presentation",
+    type: 0,
+    title: "팀 프로젝트 데모 발표",
+    createAt: "2026/03/04",
+    finalScore: 68,
+  }),
+  createMockRecord({
+    folderId: "folder-011",
+    variant: "interview",
+    type: 1,
+    title: "라인 플러스 모의 면접",
+    createAt: "2026/02/26",
+    finalScore: 72,
+  }),
+  createMockRecord({
+    folderId: "folder-012",
+    variant: "presentation",
+    type: 0,
+    title: "기획안 발표 2차 연습",
+    createAt: "2026/02/22",
+    finalScore: 70,
+  }),
+  createMockRecord({
+    folderId: "folder-013",
+    variant: "interview",
+    type: 1,
+    title: "CS 기본 질문 모의 면접",
+    createAt: "2026/02/18",
+    finalScore: 69,
+  }),
+  createMockRecord({
+    folderId: "folder-014",
+    variant: "presentation",
+    type: 0,
+    title: "기술 발표 첫 리허설",
+    createAt: "2026/02/14",
+    finalScore: 67,
+  }),
+  createMockRecord({
+    folderId: "folder-015",
+    variant: "interview",
+    type: 1,
+    title: "인성 면접 답변 연습",
+    createAt: "2026/02/09",
+    finalScore: 65,
+  }),
+  createMockRecord({
+    folderId: "folder-016",
+    variant: "presentation",
+    type: 0,
+    title: "자기소개 발표 연습",
+    createAt: "2026/02/04",
+    finalScore: 63,
+  }),
+];

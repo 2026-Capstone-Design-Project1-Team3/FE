@@ -55,6 +55,27 @@ export const Default: Story = {
   },
 };
 
+export const InterviewOnly: Story = {
+  args: {
+    initialData: mockData,
+    filterVariant: "interview",
+  },
+};
+
+export const PresentationOnly: Story = {
+  args: {
+    initialData: mockData,
+    filterVariant: "presentation",
+  },
+};
+
+export const CountLimited: Story = {
+  args: {
+    initialData: mockData,
+    count: 3,
+  },
+};
+
 export const Empty: Story = {
   args: {
     initialData: [],

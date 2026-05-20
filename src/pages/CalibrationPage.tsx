@@ -69,7 +69,7 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
         </p>
       </div>
       <div className="relative mx-auto w-fit">
-        <CameraComponent onError={handleCameraError} />
+        <CameraComponent onError={handleCameraError} className="h-100 w-200" />
         <div className="text-subtitle-05 absolute top-6 right-6 flex h-7 w-14 items-center justify-center rounded-lg bg-gray-700 text-white">
           0{countdown} sec
         </div>
