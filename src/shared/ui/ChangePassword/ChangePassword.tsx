@@ -1,17 +1,30 @@
-import { type FC, type ChangeEvent, useState } from "react";
+import { type ChangeEvent, type FC, useState } from "react";
 
 import { Eye, EyeClosed } from "lucide-react";
 
+import type { UpdateUserRequest } from "@/entities/user/model/types";
 import { TextInput } from "@/shared/ui/TextInput/TextInput";
 
-export interface ChangePasswordProps {
+type PasswordField = keyof Pick<
+  UpdateUserRequest,
+  "newPassWord" | "pastPassWord"
+>;
+
+type ChangePasswordValue = Record<PasswordField, string> & {
+  newPassWordConfirm: string;
+};
+
+export interface ChangePasswordProps extends ChangePasswordValue {
   className?: string;
+  disabled?: boolean;
+  onChange: (value: ChangePasswordValue) => void;
 }
 
-export interface PasswordInputTextProps {
+interface PasswordInputTextProps {
   placeholder: string;
   bottomMessage?: string;
   isOk?: boolean;
+  disabled?: boolean;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   id: string;
@@ -22,6 +35,7 @@ const PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,16}$/;
 export const PasswordInputText: FC<PasswordInputTextProps> = ({
   placeholder,
   bottomMessage,
+  disabled = false,
   isOk,
   value,
   onChange,
@@ -53,6 +67,7 @@ export const PasswordInputText: FC<PasswordInputTextProps> = ({
       required={false}
       value={value}
       onChange={onChange}
+      disabled={disabled}
       bottomMessage={bottomMessage}
       isOk={isOk}
       rightElement={PasswordToggleButton}
@@ -61,28 +76,35 @@ export const PasswordInputText: FC<PasswordInputTextProps> = ({
   );
 };
 
-export const ChangePassword: FC<ChangePasswordProps> = ({ className }) => {
-  const [pastPassword, setPastPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
-
-  const isNewPwValid = PW_REGEX.test(newPassword);
-  const isConfirmValid =
-    newPassword === newPasswordConfirm && newPasswordConfirm.length > 0;
-
-  const getNewPwMessage = () => {
-    if (!newPassword) return { message: undefined, isOk: undefined };
-    return isNewPwValid
-      ? { message: "유효한 형식의 비밀번호입니다.", isOk: true }
-      : { message: "유효하지 않은 형식의 비밀번호입니다.", isOk: false };
+export const ChangePassword: FC<ChangePasswordProps> = ({
+  className,
+  disabled = false,
+  newPassWord,
+  newPassWordConfirm,
+  onChange,
+  pastPassWord,
+}) => {
+  const updatePasswordValue = (nextValue: Partial<ChangePasswordValue>) => {
+    onChange({
+      newPassWord,
+      newPassWordConfirm,
+      pastPassWord,
+      ...nextValue,
+    });
   };
 
-  const getConfirmMessage = () => {
-    if (!newPasswordConfirm) return { message: undefined, isOk: undefined };
-    return isConfirmValid
-      ? { message: "비밀번호가 일치합니다.", isOk: true }
-      : { message: "비밀번호가 일치하지 않습니다.", isOk: false };
-  };
+  const isNewPwValid = PW_REGEX.test(newPassWord);
+  const newPwMessage = !newPassWord
+    ? undefined
+    : isNewPwValid
+      ? "유효한 형식의 비밀번호입니다."
+      : "유효하지 않은 형식의 비밀번호입니다.";
+  const isConfirmValid = newPassWord === newPassWordConfirm;
+  const confirmMessage = !newPassWordConfirm
+    ? undefined
+    : isConfirmValid
+      ? "비밀번호가 일치합니다."
+      : "비밀번호가 일치하지 않습니다.";
 
   return (
     <section className={className}>
@@ -99,24 +121,31 @@ export const ChangePassword: FC<ChangePasswordProps> = ({ className }) => {
         <PasswordInputText
           id="past-password"
           placeholder="현재 비밀번호"
-          value={pastPassword}
-          onChange={(e) => setPastPassword(e.target.value)}
+          value={pastPassWord}
+          onChange={(e) =>
+            updatePasswordValue({ pastPassWord: e.target.value })
+          }
+          disabled={disabled}
         />
         <PasswordInputText
           id="new-password"
           placeholder="새 비밀번호"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          bottomMessage={getNewPwMessage().message}
-          isOk={getNewPwMessage().isOk}
+          value={newPassWord}
+          onChange={(e) => updatePasswordValue({ newPassWord: e.target.value })}
+          bottomMessage={newPwMessage}
+          disabled={disabled}
+          isOk={newPwMessage ? isNewPwValid : undefined}
         />
         <PasswordInputText
           id="confirm-password"
           placeholder="새 비밀번호 확인"
-          value={newPasswordConfirm}
-          onChange={(e) => setNewPasswordConfirm(e.target.value)}
-          bottomMessage={getConfirmMessage().message}
-          isOk={getConfirmMessage().isOk}
+          value={newPassWordConfirm}
+          onChange={(e) =>
+            updatePasswordValue({ newPassWordConfirm: e.target.value })
+          }
+          bottomMessage={confirmMessage}
+          disabled={disabled}
+          isOk={confirmMessage ? isConfirmValid : undefined}
         />
       </form>
     </section>

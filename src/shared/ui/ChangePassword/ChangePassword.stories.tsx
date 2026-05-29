@@ -19,6 +19,10 @@ const meta = {
   args: {
     className:
       "w-[400px] p-6 bg-background-primary border border-gray-200 rounded-lg",
+    newPassWord: "",
+    newPassWordConfirm: "",
+    onChange: () => {},
+    pastPassWord: "",
   },
 } satisfies Meta<typeof ChangePassword>;
 
@@ -26,3 +30,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+    newPassWord: "Password!123",
+    newPassWordConfirm: "Password!123",
+    pastPassWord: "Current!123",
+  },
+};
+
+export const EdgeCase: Story = {
+  args: {
+    newPassWord: "short",
+    newPassWordConfirm: "different",
+    pastPassWord: "",
+  },
+};

@@ -15,7 +15,7 @@ const meta = {
     },
   },
   args: {
-    userName: "홍길동",
+    name: "홍길동",
     email: "knu_student@knu.ac.kr",
     className: "p-4 bg-white",
   },
@@ -26,9 +26,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Empty: Story = {
+export const Disabled: Story = {
   args: {
-    userName: "",
+    className: "p-4 bg-white opacity-60",
+  },
+};
+
+export const EdgeCase: Story = {
+  args: {
+    name: "",
     email: "",
   },
 };
