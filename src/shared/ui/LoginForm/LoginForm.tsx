@@ -4,6 +4,8 @@ import { Eye, EyeClosed } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import { useLoginMutation } from "@/features/user/model/useLoginMutation";
+import { isApiHttpError } from "@/shared/api/http-error";
 import { Button } from "@/shared/ui/Button/Button";
 import { TextInput } from "@/shared/ui/TextInput/TextInput";
 
@@ -12,6 +14,8 @@ export const LoginForm = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const { mutate: login, isPending } = useLoginMutation();
 
   const isFormValid = userId.trim() !== "" && password.trim() !== "";
 
@@ -25,13 +29,33 @@ export const LoginForm = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.info("로그인 완료!", { userId, password });
-    toast.success("로그인이 완료되었습니다.");
-    navigate("/");
+    if (!isFormValid) return;
+
+    login(
+      { loginId: userId, passWord: password },
+      {
+        onSuccess: (token) => {
+          localStorage.setItem("accessToken", token);
+          toast.success("로그인에 성공하였습니다.");
+          navigate("/");
+        },
+        onError: (error: unknown) => {
+          let errorMessage = "로그인에 실패했습니다.";
+
+          if (isApiHttpError(error) && error.message) {
+            if (error.message.includes("틀렸다")) {
+              errorMessage = "아이디 또는 비밀번호가 일치하지 않습니다.";
+            } else {
+              errorMessage = error.message;
+            }
+          }
+
+          toast.error(errorMessage);
+        },
+      },
+    );
   };
   const handleGoToSignup = () => {
-    console.info("회원가입하러 가기");
-    toast("회원가입 페이지로 이동");
     navigate("/signup");
   };
 
@@ -81,8 +105,8 @@ export const LoginForm = () => {
             className="pr-11.5"
           />
           <div className="mt-auto flex flex-col gap-6">
-            <Button type="submit" disabled={!isFormValid}>
-              로그인
+            <Button type="submit" disabled={!isFormValid || isPending}>
+              {isPending ? "로그인 중" : "로그인"}
             </Button>
             <div className="flex justify-center items-center gap-1.5 text-label-04 text-text-secondary">
               <span>아직 계정이 없으신가요?</span>
