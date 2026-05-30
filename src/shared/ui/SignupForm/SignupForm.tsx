@@ -4,13 +4,17 @@ import { ChevronLeft, Eye, EyeClosed } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import { useCheckLoginIdMutation } from "@/features/user/model/useCheckLoginIdMutation";
+import { useSignUpMutation } from "@/features/user/model/useSignUpMutation";
+import { isApiHttpError } from "@/shared/api/http-error";
 import { Button } from "@/shared/ui/Button/Button";
 import { CheckButton } from "@/shared/ui/CheckButton/CheckButton";
 import { SignupStepBadge } from "@/shared/ui/SignupStepBadge/SignupStepBadge";
 import { TextInput } from "@/shared/ui/TextInput/TextInput";
 
 const ID_REGEX = /^(?=.*[a-z])(?=.*\d)[a-z\d]{8,16}$/;
-const PW_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,16}$/;
+const PW_REGEX =
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
 const NAME_REGEX = /^[가-힣]{2,10}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -29,6 +33,10 @@ export const SignupForm = () => {
   >("default");
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+
+  const { mutate: checkId, isPending: isCheckingId } =
+    useCheckLoginIdMutation();
+  const { mutate: signUp, isPending: isSigningUp } = useSignUpMutation();
 
   const isIdValid = ID_REGEX.test(userId);
   const isPwValid = PW_REGEX.test(password);
@@ -53,9 +61,29 @@ export const SignupForm = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.info("회원가입 완료!", { userId, password, userName, userEmail });
-    toast.success("회원가입이 완료되었습니다.");
-    navigate("/");
+    if (!isStep2Valid) return;
+
+    signUp(
+      {
+        loginId: userId,
+        passWord: password,
+        name: userName,
+        email: userEmail,
+      },
+      {
+        onSuccess: () => {
+          toast.success("회원가입이 완료되었습니다. 로그인해 주세요.");
+          navigate("/login");
+        },
+        onError: (error: unknown) => {
+          const errorMessage =
+            isApiHttpError(error) && error.message
+              ? error.message
+              : "회원가입에 실패했습니다. 입력한 정보를 다시 확인해 주세요.";
+          toast.error(errorMessage);
+        },
+      },
+    );
   };
 
   const handleCheckIdDuplication = () => {
@@ -63,15 +91,28 @@ export const SignupForm = () => {
     if (!isIdValid) return;
 
     setIdCheckStatus("checking");
-    setTimeout(() => {
-      setIdCheckStatus("checked");
-      console.info("아이디 중복 확인 완료");
-    }, 1500);
+    checkId(userId, {
+      onSuccess: () => {
+        setIdCheckStatus("checked");
+        toast.success("사용 가능한 아이디입니다.");
+      },
+      onError: (error: unknown) => {
+        setIdCheckStatus("default");
+        let errorMessage = "이미 사용 중이거나 확인할 수 없는 아이디입니다.";
+
+        if (isApiHttpError(error) && error.message) {
+          if (error.message.includes("중복된 아이디")) {
+            errorMessage = "이미 사용 중인 아이디입니다.";
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        toast.error(errorMessage);
+      },
+    });
   };
 
   const handleGoToLogin = () => {
-    console.info("로그인하러 가기");
-    toast("로그인 페이지로 이동");
     navigate("/login");
   };
 
@@ -161,7 +202,9 @@ export const SignupForm = () => {
                 <CheckButton
                   variant={idCheckStatus}
                   onClick={handleCheckIdDuplication}
-                  disabled={!isIdValid || idCheckStatus === "checked"}
+                  disabled={
+                    !isIdValid || idCheckStatus === "checked" || isCheckingId
+                  }
                 />
               }
               className="pr-24"
@@ -258,8 +301,8 @@ export const SignupForm = () => {
               isOk={emailInfo.isOk}
             />
             <div className="mt-auto flex flex-col gap-6">
-              <Button type="submit" disabled={!isStep2Valid}>
-                가입 완료하기
+              <Button type="submit" disabled={!isStep2Valid || isSigningUp}>
+                {isSigningUp ? "가입 처리 중" : "가입 완료하기"}
               </Button>
               <div className="flex justify-center items-center gap-1.5 text-label-04 text-text-secondary">
                 <span>이미 계정이 있으신가요?</span>
