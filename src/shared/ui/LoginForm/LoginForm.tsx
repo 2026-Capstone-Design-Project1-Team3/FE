@@ -1,16 +1,19 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { Eye, EyeClosed } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { useLoginMutation } from "@/features/user/model/useLoginMutation";
 import { isApiHttpError } from "@/shared/api/http-error";
+import { queryKeys } from "@/shared/api/query-keys";
 import { Button } from "@/shared/ui/Button/Button";
 import { TextInput } from "@/shared/ui/TextInput/TextInput";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,9 +37,11 @@ export const LoginForm = () => {
     login(
       { loginId: userId, passWord: password },
       {
-        onSuccess: (token) => {
-          localStorage.setItem("accessToken", token);
+        onSuccess: () => {
           toast.success("로그인에 성공하였습니다.");
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.user.me(),
+          });
           navigate("/");
         },
         onError: (error: unknown) => {
