@@ -1,16 +1,21 @@
 import { useCardNewsQuery } from "@/features/analysis/model/useCardNewsQuery";
-import { RecordTableRow } from "@/shared/ui/MainSection/RecordSection/RecordTableRow";
+import {
+  RecordTableRow,
+  type RecordTableRowProps,
+} from "@/shared/ui/MainSection/RecordSection/RecordTableRow";
 
 interface RecordSectionProps {
   filterVariant?: "interview" | "presentation";
   count?: number;
   className?: string;
+  initialData?: RecordTableRowProps[];
 }
 
 export const RecordSection = ({
   filterVariant,
   count = 5,
   className,
+  initialData,
 }: RecordSectionProps) => {
   const token = localStorage.getItem("accessToken");
 
@@ -27,10 +32,12 @@ export const RecordSection = ({
       how: 0,
       type: reqType,
     },
-    enabled: !!token,
+    enabled: !!token && !initialData,
   });
 
-  if (isLoading) {
+  const recentRecords = initialData || data?.cardnews || [];
+
+  if (!initialData && isLoading) {
     return (
       <section className={className}>
         <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-text-deactivated">
@@ -40,7 +47,7 @@ export const RecordSection = ({
     );
   }
 
-  if (isError) {
+  if (!initialData && isError) {
     return (
       <section className={className}>
         <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-red-500">
@@ -49,8 +56,6 @@ export const RecordSection = ({
       </section>
     );
   }
-
-  const recentRecords = data?.cardnews || [];
 
   return (
     <section className={className}>
@@ -64,7 +69,13 @@ export const RecordSection = ({
                   analysisId={record.analysisId}
                   title={record.title || "제목 없음"}
                   createdAt={record.createdAt}
-                  variant={record.type === 0 ? "presentation" : "interview"}
+                  variant={
+                    "variant" in record
+                      ? record.variant
+                      : record.type === 0
+                        ? "presentation"
+                        : "interview"
+                  }
                 />
               ))
             ) : (

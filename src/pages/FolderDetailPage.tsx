@@ -8,6 +8,7 @@ import { interviewRecords, presentationRecords } from "@/mocks/reportPageData";
 import { FolderInsightSummary } from "@/shared/ui/FolderDetail/FolderInsightSummary/FolderInsightSummary";
 import { FolderScoreCard } from "@/shared/ui/FolderDetail/FolderScoreCard/FolderScoreCard";
 import { RecordSection } from "@/shared/ui/MainSection/RecordSection/RecordSection";
+import type { RecordTableRowProps } from "@/shared/ui/MainSection/RecordSection/RecordTableRow";
 import { Pagination } from "@/shared/ui/Pagination/Pagination";
 
 const ITEMS_PER_PAGE = 5;
@@ -30,25 +31,45 @@ export const FolderDetailPage = () => {
     1,
     Math.ceil(folderRecords.length / ITEMS_PER_PAGE),
   );
+
+  const titleRecord = [
+    ...interviewRecords,
+    ...presentationRecords,
+    ...mockRecords,
+    ...folderRecords,
+  ].find((item: unknown) => {
+    const r = item as Record<string, unknown>;
+    return r.analysisId === folderId || r.folderId === folderId;
+  });
+
   const folderTitle =
     stateFolderTitle ??
-    [
-      ...interviewRecords,
-      ...presentationRecords,
-      ...mockRecords,
-      ...folderRecords,
-    ].find((record) => record.folderId === folderId)?.title ??
+    (titleRecord && typeof titleRecord.title === "string"
+      ? titleRecord.title
+      : undefined) ??
     folderId ??
     "폴더명";
+
   const paginatedRecords = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
     return folderRecords
       .slice(startIndex, startIndex + ITEMS_PER_PAGE)
-      .map((record) => ({
-        ...record,
-        variant,
-      }));
+      .map((item: unknown) => {
+        const r = item as Record<string, unknown>;
+        const validId =
+          typeof r.analysisId === "string"
+            ? r.analysisId
+            : typeof r.folderId === "string"
+              ? r.folderId
+              : "";
+
+        return {
+          ...r,
+          analysisId: validId,
+          variant: variant as "interview" | "presentation",
+        } as unknown as RecordTableRowProps;
+      });
   }, [currentPage, variant]);
 
   return (
