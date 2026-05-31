@@ -30,7 +30,3 @@ export interface AnalysisDetailResponse {
 export interface AnalysisStatisticsResponse {
   [key: string]: unknown;
 }
-
-export interface CardNewsResponse {
-  [key: string]: unknown;
-}
