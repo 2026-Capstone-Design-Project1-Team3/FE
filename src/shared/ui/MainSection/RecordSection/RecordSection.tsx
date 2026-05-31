@@ -1,33 +1,61 @@
-import { useEffect, useState } from "react";
-
-import { mockRecords } from "@/mocks/mainRecordData";
+import { useCardNewsQuery } from "@/features/analysis/model/useCardNewsQuery";
 import {
   RecordTableRow,
   type RecordTableRowProps,
 } from "@/shared/ui/MainSection/RecordSection/RecordTableRow";
 
 interface RecordSectionProps {
-  initialData?: RecordTableRowProps[];
-  filterVariant?: RecordTableRowProps["variant"];
+  filterVariant?: "interview" | "presentation";
   count?: number;
   className?: string;
+  initialData?: RecordTableRowProps[];
 }
 
 export const RecordSection = ({
-  initialData = mockRecords,
   filterVariant,
   count = 5,
   className,
+  initialData,
 }: RecordSectionProps) => {
-  const [records, setRecords] = useState<RecordTableRowProps[]>(initialData);
-  const filteredRecords = filterVariant
-    ? records.filter((record) => record.variant === filterVariant)
-    : records;
-  const recentRecords = filteredRecords.slice(0, count);
+  const token = localStorage.getItem("accessToken");
 
-  useEffect(() => {
-    setRecords(initialData);
-  }, [initialData]);
+  const reqType =
+    filterVariant === "presentation"
+      ? 0
+      : filterVariant === "interview"
+        ? 1
+        : undefined;
+
+  const { data, isLoading, isError } = useCardNewsQuery({
+    params: {
+      limit: count,
+      how: 0,
+      type: reqType,
+    },
+    enabled: !!token && !initialData,
+  });
+
+  const recentRecords = initialData || data?.cardnews || [];
+
+  if (!initialData && isLoading) {
+    return (
+      <section className={className}>
+        <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-text-deactivated">
+          기록을 불러오는 중입니다...
+        </div>
+      </section>
+    );
+  }
+
+  if (!initialData && isError) {
+    return (
+      <section className={className}>
+        <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-red-500">
+          기록을 불러오는데 실패했습니다.
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={className}>
@@ -37,16 +65,23 @@ export const RecordSection = ({
             {recentRecords.length > 0 ? (
               recentRecords.map((record) => (
                 <RecordTableRow
-                  key={record.folderId}
-                  {...record}
+                  key={record.analysisId}
+                  analysisId={record.analysisId}
                   title={record.title || "제목 없음"}
-                  createAt={record.createAt || "--"}
+                  createdAt={record.createdAt}
+                  variant={
+                    "variant" in record
+                      ? record.variant
+                      : record.type === 0
+                        ? "presentation"
+                        : "interview"
+                  }
                 />
               ))
             ) : (
               <tr>
-                <td className="text-body-02 py-40 text-center text-text-deactivated">
-                  기록이 없습니다.
+                <td className="text-body-01 py-40 text-center text-text-deactivated">
+                  아직 연습 기록이 없습니다. 새로운 연습을 시작해 보세요!
                 </td>
               </tr>
             )}

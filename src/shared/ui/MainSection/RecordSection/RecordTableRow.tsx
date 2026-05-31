@@ -43,17 +43,17 @@ const variantConfigMap: Record<
 };
 
 export interface RecordTableRowProps extends RecordAnalysis {
-  folderId: string;
+  analysisId: string;
   variant: RecordTableRowVariant;
   title?: string;
-  createAt?: string;
+  createdAt?: string;
 }
 
 export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
-  const { folderId, variant, title, createAt } = props;
+  const { analysisId, variant, title, createdAt } = props;
   const navigate = useNavigate();
   const { Icon, Color, Text } = variantConfigMap[variant];
-  const detailPath = `/report/${variant}/${folderId}`;
+  const detailPath = `/report/${variant}/${analysisId}`;
 
   const handleReportClick = () => {
     navigate(detailPath, {
@@ -65,7 +65,7 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
   };
 
   return (
-    <tr key={folderId}>
+    <tr key={analysisId}>
       <td className="p-0">
         <div className="flex items-center justify-between gap-2 p-5">
           <div className="text-body-01 flex items-center gap-3 text-text-primary">
@@ -77,14 +77,14 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
               <div className="flex items-center gap-1 text-text-deactivated">
                 <span className={cn(Color, "bg-background-light")}>{Text}</span>
                 <span>•</span>
-                <span className="text-body-03">{createAt}</span>
+                <span className="text-body-03">{createdAt}</span>
               </div>
             </div>
           </div>
           <button
             type="button"
             onClick={handleReportClick}
-            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-700 hover:text-text-inverse"
+            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-50"
           >
             리포트 보기
           </button>
