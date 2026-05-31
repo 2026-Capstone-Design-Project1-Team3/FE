@@ -11,17 +11,24 @@ export interface LoginRequest {
 }
 
 export interface UpdateUserRequest {
-  pastPassWord?: string;
-  newPassWord?: string;
+  pastPassWord?: null | string;
+  newPassWord?: null | string;
   name?: string;
   email?: string;
 }
 
 export interface UserEyeRequest {
-  userId?: string;
-  leftEyeOffset?: number;
-  rightEyeOffset?: number;
-  ratio?: number;
+  leftEyeOffset: number;
+  rightEyeOffset: number;
+  ratio: number;
+}
+
+export interface SendCalibrationChunkPayload {
+  folderId: string;
+  token: string;
+  eye: UserEyeRequest;
+  type: "CALIBRATION_CHUNK";
+  videoData: string;
 }
 
 export interface UserProfile {

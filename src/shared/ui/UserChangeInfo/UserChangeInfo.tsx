@@ -1,32 +1,33 @@
-import { type FC, useState } from "react";
+import type { FC } from "react";
 
+import type {
+  UpdateUserRequest,
+  UserProfile,
+} from "@/entities/user/model/types";
 import { TextInput } from "@/shared/ui/TextInput/TextInput";
 
 const NAME_REGEX = /^[가-힣]{2,10}$/;
 
-export interface UserPrevInfo {
-  prevName?: string;
-  userId?: string;
-  userEmail?: string;
-}
+type UserChangeInfoValue = Required<Pick<UpdateUserRequest, "email" | "name">>;
 
-export interface UserChangeInfoProps extends UserPrevInfo {
+export interface UserChangeInfoProps
+  extends Pick<UserProfile, "loginId">, UserChangeInfoValue {
   className?: string;
+  disabled?: boolean;
+  onChange: (value: UserChangeInfoValue) => void;
 }
 
-export const UserChangeInfo: FC<UserChangeInfoProps> = (props) => {
-  const { prevName, userId, userEmail, className } = props;
-  const [userName, setUserName] = useState("");
-
-  const isNameValid = NAME_REGEX.test(userName);
-
-  const getNameMessageInfo = () => {
-    if (!userName) return { message: undefined, isOk: undefined };
-    if (isNameValid) return { message: undefined, isOk: true };
-    return { message: "유효하지 않은 형식의 이름입니다.", isOk: false };
-  };
-
-  const nameInfo = getNameMessageInfo();
+export const UserChangeInfo: FC<UserChangeInfoProps> = ({
+  loginId,
+  className,
+  disabled = false,
+  email,
+  name,
+  onChange,
+}) => {
+  const isNameValid = NAME_REGEX.test(name);
+  const nameMessage =
+    name && !isNameValid ? "유효하지 않은 형식의 이름입니다." : undefined;
 
   return (
     <section className={className}>
@@ -36,17 +37,19 @@ export const UserChangeInfo: FC<UserChangeInfoProps> = (props) => {
           <TextInput
             id="userName"
             label="이름"
-            placeholder={prevName}
+            placeholder="이름"
             required={false}
-            onChange={(e) => setUserName(e.target.value)}
-            bottomMessage={nameInfo.message}
-            isOk={nameInfo.isOk}
+            value={name}
+            onChange={(e) => onChange({ email, name: e.target.value })}
+            bottomMessage={nameMessage}
+            disabled={disabled}
+            isOk={name ? isNameValid : undefined}
           />
           <TextInput
             id="userId"
             label="아이디"
             required={false}
-            value={userId}
+            value={loginId ?? ""}
             disabled
           />
         </div>
@@ -55,9 +58,9 @@ export const UserChangeInfo: FC<UserChangeInfoProps> = (props) => {
           type="email"
           label="이메일 주소"
           required={false}
-          value={userEmail}
+          value={email}
           disabled
-        ></TextInput>
+        />
       </form>
     </section>
   );

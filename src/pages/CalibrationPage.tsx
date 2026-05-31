@@ -1,64 +1,154 @@
-import { type FC, useEffect, useState, useCallback } from "react";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-import CameraComponent from "@/shared/ui/CameraComponent/CameraComponent";
+import { useSendCalibrationChunkMutation } from "@/features/user/model/useSendCalibrationChunkMutation";
+import { useUserEyeQuery } from "@/features/user/model/useUserEyeQuery";
+import CameraComponent, {
+  type CameraHandle,
+} from "@/shared/ui/CameraComponent/CameraComponent";
 import { Modal } from "@/shared/ui/Modal/Modal";
 
 export interface CalibrationPageProps {
   sec?: number;
 }
 
-const CalibrationPage: FC<CalibrationPageProps> = (props) => {
-  const { sec = 5 } = props;
+const RECORDER_MIME_TYPES = ["video/webm;codecs=vp8", "video/webm"];
+
+const wait = (durationMs: number) =>
+  new Promise((resolve) => window.setTimeout(resolve, durationMs));
+
+const blobToBase64 = (blob: Blob) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (typeof result === "string") resolve(result.split(",")[1] ?? "");
+      else reject(new Error("영상 변환에 실패했습니다."));
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+
+const recordCalibrationVideo = (stream: MediaStream, durationMs: number) =>
+  new Promise<string>((resolve, reject) => {
+    const mimeType = RECORDER_MIME_TYPES.find(MediaRecorder.isTypeSupported);
+    const recorder = new MediaRecorder(
+      stream,
+      mimeType ? { mimeType } : undefined,
+    );
+    const chunks: Blob[] = [];
+
+    recorder.ondataavailable = ({ data }) => data.size && chunks.push(data);
+    recorder.onerror = () =>
+      reject(new Error("캘리브레이션 영상 녹화에 실패했습니다."));
+    recorder.onstop = async () => {
+      try {
+        resolve(
+          await blobToBase64(new Blob(chunks, { type: recorder.mimeType })),
+        );
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    recorder.start();
+    window.setTimeout(() => {
+      if (recorder.state !== "inactive") recorder.stop();
+    }, durationMs);
+  });
+
+const CalibrationPage: FC<CalibrationPageProps> = ({ sec = 5 }) => {
+  const cameraRef = useRef<CameraHandle>(null);
   const [countdown, setCountdown] = useState(sec);
-  const [isActive, setIsActive] = useState(false);
-  const [complete, setComplete] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [activeModal, setActiveModal] = useState<"complete" | "fail" | null>(
+    null,
+  );
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { data: eye } = useUserEyeQuery();
+  const { isPending, mutateAsync } = useSendCalibrationChunkMutation();
 
-  const navigation = useNavigate();
-
+  const eyeOffset = eye ?? { leftEyeOffset: 0, ratio: 0, rightEyeOffset: 0 };
+  const folderId = searchParams.get("folderId") ?? "calibration";
   const progress = ((sec - countdown) / sec) * 100;
-
+  const isProcessing = isRecording || isPending;
+  const progressWidth = isRecording
+    ? progress
+    : activeModal === "complete"
+      ? 100
+      : 0;
+  const startButtonText = errorMessage
+    ? errorMessage
+    : isProcessing
+      ? "촬영 중"
+      : activeModal === "complete"
+        ? "다시 촬영하기"
+        : "촬영하기";
   const handleCameraError = useCallback((msg: string | null) => {
-    setHasError(!!msg);
+    setErrorMessage(msg ? "권한 설정 필요" : "");
   }, []);
 
   useEffect(() => {
-    if (!isActive) return;
+    if (!isRecording || countdown === 0) return;
 
-    if (countdown === 0) {
-      const timer = setTimeout(() => {
-        setIsActive(false);
-        setComplete(true);
-        setIsModalOpen(true);
-      }, 800);
-
-      return () => clearTimeout(timer);
-    }
-
-    const interval = setInterval(() => {
-      setCountdown((prev) => prev - 1);
+    const interval = window.setInterval(() => {
+      setCountdown((prev) => Math.max(0, prev - 1));
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [isActive, countdown]);
+    return () => window.clearInterval(interval);
+  }, [countdown, isRecording]);
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    const stream = cameraRef.current?.video?.srcObject;
+    const token = localStorage.getItem("accessToken");
+
+    if (!(stream instanceof MediaStream)) {
+      setErrorMessage("권한 설정 필요");
+      return;
+    }
+
+    if (!token) {
+      setErrorMessage("로그인 필요");
+      return;
+    }
+
     setCountdown(sec);
-    setIsActive(true);
-  };
+    setIsRecording(true);
+    setActiveModal(null);
+    setErrorMessage("");
 
-  const handleGoToMyPage = () => {
-    navigation("/my");
+    try {
+      const durationMs = sec * 1000;
+      const [videoData] = await Promise.all([
+        recordCalibrationVideo(stream, durationMs),
+        wait(durationMs),
+      ]);
+
+      await mutateAsync({
+        eye: eyeOffset,
+        folderId,
+        token,
+        type: "CALIBRATION_CHUNK",
+        videoData,
+      });
+      setActiveModal("complete");
+    } catch {
+      setActiveModal("fail");
+    } finally {
+      setIsRecording(false);
+    }
   };
 
   const handleModalClose = () => {
-    setIsModalOpen(false);
-    navigation("/my");
+    setActiveModal(null);
+    navigate("/my");
   };
+  const closeFailModal = () => setActiveModal(null);
 
   return (
     <main className="overflow-hidden">
@@ -69,7 +159,11 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
         </p>
       </div>
       <div className="relative mx-auto w-fit">
-        <CameraComponent onError={handleCameraError} className="h-100 w-200" />
+        <CameraComponent
+          ref={cameraRef}
+          onError={handleCameraError}
+          className="h-100 w-200"
+        />
         <div className="text-subtitle-05 absolute top-6 right-6 flex h-7 w-14 items-center justify-center rounded-lg bg-gray-700 text-white">
           0{countdown} sec
         </div>
@@ -97,7 +191,7 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
             <div
               className="bg-secondary-900 h-full rounded-2xl"
               style={{
-                width: `${isActive ? progress : complete ? 100 : 0}%`,
+                width: `${progressWidth}%`,
                 transition: "width 300ms ease-out",
               }}
             />
@@ -105,29 +199,23 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
         </div>
         <div className="flex justify-center gap-5 py-5">
           <button
-            onClick={handleGoToMyPage}
-            disabled={isActive}
+            onClick={() => navigate("/my")}
+            disabled={isProcessing}
             className="cursor-pointer w-48 rounded-xl border-2 border-gray-700 py-2 text-gray-700 hover:bg-gray-700 hover:text-white"
           >
             취소
           </button>
           <button
-            onClick={handleStart}
-            disabled={isActive || hasError}
+            disabled={isProcessing || errorMessage === "권한 설정 필요"}
             className="border-secondary-900 bg-secondary-900 hover:border-secondary-800 hover:bg-secondary-800 cursor-pointer rounded-xl border-2 w-48 py-3 text-white disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed"
+            onClick={handleStart}
           >
-            {hasError
-              ? "권한 설정 필요"
-              : isActive
-                ? "촬영 중"
-                : complete
-                  ? "다시 촬영하기"
-                  : "촬영하기"}
+            {startButtonText}
           </button>
         </div>
       </section>
       <Modal
-        isOpen={isModalOpen}
+        isOpen={activeModal === "complete"}
         variant="single"
         title="캘리브레이션 완료"
         description={
@@ -136,6 +224,15 @@ const CalibrationPage: FC<CalibrationPageProps> = (props) => {
         confirmText="확인"
         onClose={handleModalClose}
         onConfirm={handleModalClose}
+      />
+      <Modal
+        isOpen={activeModal === "fail"}
+        variant="single"
+        title="전송 실패"
+        description="캘리브레이션 영상 전송에 실패했습니다. 잠시 후 다시 시도해주세요."
+        confirmText="확인"
+        onClose={closeFailModal}
+        onConfirm={closeFailModal}
       />
     </main>
   );
