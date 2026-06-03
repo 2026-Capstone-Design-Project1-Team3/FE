@@ -1,36 +1,130 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
+import { useUploadPdfFileMutation } from "@/features/file/model/useUploadPdfFileMutation";
+import { useCreateFolderMutation } from "@/features/folder/model/useCreateFolderMutation";
+import { useFolderListQuery } from "@/features/folder/model/useFolderListQuery";
 import { Button } from "@/shared/ui/Button/Button";
-import { AIAnalysisCard } from "@/shared/ui/PrepareSection/AIAnalysisCard/AIAnalysisCard";
 import { FileUploadCard } from "@/shared/ui/PrepareSection/FileUploadCard/FileUploadCard";
+import {
+  FolderSelectModal,
+  type FolderData,
+} from "@/shared/ui/PrepareSection/FolderSelectModal/FolderSelectModal";
 import { SelectPracticeCard } from "@/shared/ui/PrepareSection/SelectPracticeCard/SelectPracticeCard";
 import { TextInput } from "@/shared/ui/TextInput/TextInput";
 
-const MOCK_EXISTING_DATA = {
-  folderName: "2024년 상반기 신입 공채",
-  companyName: "삼성전자",
-  jobRole: "소프트웨어 개발 (Backend)",
-  resume: {
-    fileName: "2024_자기소개서_최종.pdf",
-    fileSize: 1.2 * 1024 * 1024,
-  },
-  portfolio: {
-    fileName: "2024_포트폴리오_최종.pdf",
-    fileSize: 15.8 * 1024 * 1024,
-  },
-};
+const INTERVIEW_TYPE = 1;
 
 export const InterviewPreparePage = () => {
+  const navigate = useNavigate();
   const [selectedPractice, setSelectedPractice] = useState<"new" | "existing">(
-    "existing",
+    "new",
   );
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [selectedFolderTitle, setSelectedFolderTitle] = useState("");
+  const [interviewTitle, setInterviewTitle] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [jobRole, setJobRole] = useState("");
+  const [resumeText, setResumeText] = useState("");
+  const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
+
+  const { data: folders = [] } = useFolderListQuery({
+    type: INTERVIEW_TYPE,
+  });
+  const uploadPdfMutation = useUploadPdfFileMutation();
+  const createFolderMutation = useCreateFolderMutation();
+
+  const isSubmitting =
+    uploadPdfMutation.isPending || createFolderMutation.isPending;
+
+  const folderOptions: FolderData[] = folders.map((folder) => ({
+    id: folder.folderId,
+    title: folder.title,
+    date: folder.updatedAt,
+    videoCount: folder.totalAnalyses,
+  }));
+
+  const handleSelectFolder = (folderId: string) => {
+    const folder = folders.find((item) => item.folderId === folderId);
+    setSelectedFolderId(folderId);
+    setSelectedFolderTitle(folder?.title ?? "");
+    setSelectedPractice("existing");
+  };
+
+  const handleStartExisting = () => {
+    if (!selectedFolderId) {
+      toast.error("이어갈 면접 폴더를 선택해 주세요.");
+      return;
+    }
+
+    navigate("/interview/record", {
+      state: { folderId: selectedFolderId, type: INTERVIEW_TYPE },
+    });
+  };
+
+  const handleCreateInterview = async () => {
+    if (!interviewTitle.trim()) {
+      toast.error("면접 제목을 입력해 주세요.");
+      return;
+    }
+
+    if (!companyName.trim()) {
+      toast.error("지원 회사를 입력해 주세요.");
+      return;
+    }
+
+    if (!jobRole.trim()) {
+      toast.error("지원 직무를 입력해 주세요.");
+      return;
+    }
+
+    if (!resumeText.trim()) {
+      toast.error("자기소개서 내용을 입력해 주세요.");
+      return;
+    }
+
+    if (!portfolioFile) {
+      toast.error("포트폴리오 PDF를 업로드해 주세요.");
+      return;
+    }
+
+    try {
+      const uploadedFile = await uploadPdfMutation.mutateAsync(portfolioFile);
+      await createFolderMutation.mutateAsync({
+        title: interviewTitle.trim(),
+        fileName: uploadedFile.fileName,
+        fileKey: uploadedFile.fileKey,
+        extraInfo: jobRole.trim(),
+        companyName: companyName.trim(),
+        inputText: resumeText.trim(),
+        type: INTERVIEW_TYPE,
+      });
+
+      toast.success("면접 연습이 생성되었습니다.");
+    } catch (error) {
+      console.error(error);
+      toast.error("면접 준비 설정 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleSubmit = () => {
+    if (selectedPractice === "existing") {
+      handleStartExisting();
+      return;
+    }
+
+    void handleCreateInterview();
+  };
 
   return (
     <div className="flex flex-col items-center min-h-screen py-16 px-4 font-sans">
       <header className="flex flex-col items-center text-center mb-12">
         <h1 className="text-head-01 text-text-primary mb-3">면접 연습 준비</h1>
         <p className="text-body-01 text-text-secondary">
-          AI 코치와 함께 실전 같은 면접을 준비하세요.
+          지원 정보와 자기소개서를 바탕으로 맞춤 면접을 준비해 보세요.
         </p>
       </header>
 
@@ -44,12 +138,12 @@ export const InterviewPreparePage = () => {
         <SelectPracticeCard
           variant="existing"
           practiceType="interview"
-          folderName={MOCK_EXISTING_DATA.folderName}
+          folderName={selectedFolderTitle}
           isSelected={selectedPractice === "existing"}
           onClick={() => setSelectedPractice("existing")}
           onListClick={(e) => {
             e.stopPropagation();
-            console.info("목록 보기 클릭");
+            setIsFolderModalOpen(true);
           }}
         />
       </section>
@@ -59,119 +153,137 @@ export const InterviewPreparePage = () => {
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-info-01"></div>
             <span className="text-subtitle-04 text-text-secondary">
-              {selectedPractice === "new"
-                ? "새로운 면접 설정"
-                : "선택된 면접 설정"}
+              {selectedPractice === "new" ? "새 면접 정보" : "기존 면접 정보"}
             </span>
           </div>
         </div>
 
         <div className="p-8">
+          <div className="mb-8">
+            <TextInput
+              id="interviewTitle"
+              label="면접 제목"
+              placeholder="예: 구글코리아 프론트엔드 면접"
+              value={
+                selectedPractice === "existing"
+                  ? selectedFolderTitle
+                  : interviewTitle
+              }
+              disabled={selectedPractice === "existing"}
+              required={false}
+              onChange={(e) => setInterviewTitle(e.target.value)}
+            />
+          </div>
+
           <div className="flex gap-6 mb-8">
             <div className="flex-1">
               <TextInput
                 id="companyName"
                 label="지원 회사"
-                placeholder={
-                  selectedPractice === "new" ? "예: 구글 코리아" : ""
-                }
-                value={
-                  selectedPractice === "existing"
-                    ? MOCK_EXISTING_DATA.companyName
-                    : undefined
-                }
+                placeholder="예: 구글코리아"
+                value={selectedPractice === "existing" ? "" : companyName}
                 disabled={selectedPractice === "existing"}
                 required={false}
+                onChange={(e) => setCompanyName(e.target.value)}
               />
             </div>
             <div className="flex-1">
               <TextInput
                 id="jobRole"
                 label="지원 직무"
-                placeholder={
-                  selectedPractice === "new"
-                    ? "예: 시니어 프로덕트 디자이너"
-                    : ""
-                }
-                value={
-                  selectedPractice === "existing"
-                    ? MOCK_EXISTING_DATA.jobRole
-                    : undefined
-                }
+                placeholder="예: 프론트엔드 개발자"
+                value={selectedPractice === "existing" ? "" : jobRole}
                 disabled={selectedPractice === "existing"}
                 required={false}
+                onChange={(e) => setJobRole(e.target.value)}
               />
             </div>
           </div>
 
-          <div className={selectedPractice === "new" ? "mb-10" : "mb-12"}>
-            <h3 className="text-subtitle-04 text-text-secondary mb-3">
-              {selectedPractice === "new"
-                ? "서류 업로드 (자기소개서 & 포트폴리오)"
-                : "업로드된 서류"}
-            </h3>
-            <div className="flex gap-6">
-              <div className="flex-1">
-                {selectedPractice === "new" ? (
-                  <FileUploadCard title="자기소개서" variant="interactive" />
-                ) : (
-                  <FileUploadCard
-                    title="자기소개서"
-                    variant="readonly"
-                    fileName={MOCK_EXISTING_DATA.resume.fileName}
-                    fileSize={MOCK_EXISTING_DATA.resume.fileSize}
-                  />
-                )}
-              </div>
-              <div className="flex-1">
-                {selectedPractice === "new" ? (
-                  <FileUploadCard title="포트폴리오" variant="interactive" />
-                ) : (
-                  <FileUploadCard
-                    title="포트폴리오"
-                    variant="readonly"
-                    fileName={MOCK_EXISTING_DATA.portfolio.fileName}
-                    fileSize={MOCK_EXISTING_DATA.portfolio.fileSize}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-
           {selectedPractice === "new" && (
-            <div className="mb-10 flex justify-center">
-              <div className="w-full flex justify-center [&>div]:max-w-full">
-                <AIAnalysisCard
-                  scanStatus="complete"
-                  generateStatus="loading"
-                  onStartAnalysis={() => console.info("분석 시작!")}
+            <>
+              <div className="mb-12">
+                <FileUploadCard
+                  title="포트폴리오"
+                  variant="interactive"
+                  file={portfolioFile}
+                  onFileChange={setPortfolioFile}
                 />
               </div>
-            </div>
+              <div className="mb-8">
+                <label
+                  htmlFor="resumeText"
+                  className="text-label-01 text-text-secondary"
+                >
+                  자기소개서
+                </label>
+                <textarea
+                  id="resumeText"
+                  className="mt-2 h-60 w-full resize-none rounded-xl border border-border-deactivated bg-white p-4 text-label-02 text-text-primary outline-none focus:border-primary-900 focus:ring-4 focus:ring-primary-100"
+                  placeholder="자기소개서 내용을 붙여넣어 주세요."
+                  value={resumeText}
+                  onChange={(e) => setResumeText(e.target.value)}
+                />
+              </div>
+            </>
           )}
 
-          <div
-            className={`flex items-center pt-6 border-t border-border-deactivated ${selectedPractice === "new" ? "justify-between" : "justify-end"}`}
-          >
-            {selectedPractice === "new" && (
-              <button
-                type="button"
-                className="text-label-03 text-text-deactivated hover:text-text-primary transition-colors px-2"
-              >
-                초기화
-              </button>
-            )}
+          {selectedPractice === "existing" && (
+            <>
+              <div className="mb-12">
+                <FileUploadCard
+                  title="포트폴리오"
+                  variant="readonly"
+                  fileName="기존 포트폴리오"
+                  fileSize={0}
+                />
+              </div>
+              <div className="mb-8">
+                <label
+                  htmlFor="existingResumeText"
+                  className="text-label-01 text-text-secondary"
+                >
+                  자기소개서
+                </label>
+                <textarea
+                  id="existingResumeText"
+                  className="mt-2 h-60 w-full resize-none rounded-xl border border-border-deactivated bg-background-dark p-4 text-label-02 text-text-secondary outline-none"
+                  value="기존 자기소개서는 연습 시작 시 불러옵니다."
+                  disabled
+                  readOnly
+                />
+              </div>
+            </>
+          )}
+
+          <div className="flex justify-end items-center gap-4 pt-6 border-t border-border-deactivated">
+            <div className="w-32">
+              <Button variant="outline" onClick={() => navigate("/")}>
+                취소
+              </Button>
+            </div>
             <div className="w-48">
               <Button
                 variant="primary"
-                onClick={() => console.info("면접 시작!")}
+                disabled={isSubmitting}
+                onClick={handleSubmit}
               >
-                면접 시작하기
+                {selectedPractice === "existing"
+                  ? "연습 시작하기"
+                  : "연습 생성하기"}
               </Button>
             </div>
           </div>
         </div>
       </section>
+
+      <FolderSelectModal
+        isOpen={isFolderModalOpen}
+        folders={folderOptions}
+        selectedFolderId={selectedFolderId}
+        onClose={() => setIsFolderModalOpen(false)}
+        onSelectFolder={handleSelectFolder}
+      />
     </div>
   );
 };

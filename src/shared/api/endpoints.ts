@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
     statistics: (limit: number) => `/analysis/statistics/${limit}`,
   },
   file: {
-    presignedUrl: (fileName: string) => `/files/presignedUrl/${fileName}`,
+    presignedUrl: (fileName: string) =>
+      `/files/presignedUrl/${encodeURIComponent(fileName)}`,
   },
 } as const;
