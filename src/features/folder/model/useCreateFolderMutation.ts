@@ -11,7 +11,7 @@ export const useCreateFolderMutation = () => {
     mutationFn: (payload: CreateFolderRequest) => createFolder(payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: queryKeys.folder.list(),
+        queryKey: queryKeys.folder.all,
       });
     },
   });
