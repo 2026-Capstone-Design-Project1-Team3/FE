@@ -71,7 +71,7 @@ const ExistingPracticeContent = ({
         이전에 설정했던 환경에서 이어서 연습합니다.
       </p>
 
-      {isSelected && folderName && (
+      {folderName && (
         <div className="mb-4 text-subtitle-04 text-gray-700">{folderName}</div>
       )}
 

@@ -15,7 +15,6 @@ import { TimeCard } from "@/shared/ui/RecordSection/TimeCard/TimeCard";
 const MOCK_INFO = {
   variant: "interview" as const,
   folderName: "2024 상반기 공채",
-  date: "2024.05.20",
   companyName: "현대자동차",
   role: "IT 서비스 기획",
 };
@@ -54,7 +53,6 @@ const InterviewRecordPage = () => {
           <InfoCard
             variant={MOCK_INFO.variant}
             folderName={MOCK_INFO.folderName}
-            date={MOCK_INFO.date}
             companyName={MOCK_INFO.companyName}
             role={MOCK_INFO.role}
           />

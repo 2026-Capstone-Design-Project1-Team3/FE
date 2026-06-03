@@ -15,8 +15,6 @@ import { TimeCard } from "@/shared/ui/RecordSection/TimeCard/TimeCard";
 const MOCK_INFO = {
   variant: "presentation" as const,
   folderName: "2024 상반기 핵심 역량 발표",
-  date: "2024.10.24",
-  targetTime: "05:00",
 };
 
 const MOCK_SLIDES = [
@@ -49,8 +47,6 @@ const PresentationRecordPage = () => {
           <InfoCard
             variant={MOCK_INFO.variant}
             folderName={MOCK_INFO.folderName}
-            date={MOCK_INFO.date}
-            targetTime={MOCK_INFO.targetTime}
           />
         </section>
 
