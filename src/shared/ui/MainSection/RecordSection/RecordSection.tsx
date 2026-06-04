@@ -8,6 +8,7 @@ interface RecordSectionProps {
   filterVariant?: "interview" | "presentation";
   count?: number;
   className?: string;
+  folderTitle?: string;
   initialData?: RecordTableRowProps[];
 }
 
@@ -15,6 +16,7 @@ export const RecordSection = ({
   filterVariant,
   count = 5,
   className,
+  folderTitle,
   initialData,
 }: RecordSectionProps) => {
   const token = localStorage.getItem("accessToken");
@@ -35,7 +37,14 @@ export const RecordSection = ({
     enabled: !!token && !initialData,
   });
 
-  const recentRecords = initialData || data?.cardnews || [];
+  const recentRecords =
+    initialData ??
+    data?.cardnews.map((record) => ({
+      ...record,
+      folderTitle,
+      variant: record.type === 0 ? "presentation" : "interview",
+    })) ??
+    [];
 
   if (!initialData && isLoading) {
     return (
@@ -50,7 +59,7 @@ export const RecordSection = ({
   if (!initialData && isError) {
     return (
       <section className={className}>
-        <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-red-500">
+        <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-error-01">
           기록을 불러오는데 실패했습니다.
         </div>
       </section>
@@ -69,13 +78,8 @@ export const RecordSection = ({
                   analysisId={record.analysisId}
                   title={record.title || "제목 없음"}
                   createdAt={record.createdAt}
-                  variant={
-                    "variant" in record
-                      ? record.variant
-                      : record.type === 0
-                        ? "presentation"
-                        : "interview"
-                  }
+                  folderTitle={record.folderTitle ?? folderTitle}
+                  variant={record.variant}
                 />
               ))
             ) : (
