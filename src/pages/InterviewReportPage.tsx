@@ -1,12 +1,30 @@
+import { useState } from "react";
+
 import {
   ClipboardList,
   FileDown,
   LayoutDashboard,
   PlayCircle,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import {
+  formatReportDate,
+  getFluencyStatus,
+  getFinalStatus,
+  getReportReview,
+  getReportStatus,
+  getScoreDescription,
+  getSpeedDistributionDescription,
+  saveReportPdf,
+  saveReportVideo,
+  type ReportLocationState,
+  VIDEO_UNAVAILABLE_MESSAGE,
+} from "./reportDetailUtils";
+
+import { useAnalysisDetailQuery } from "@/features/analysis/model/useAnalysisDetailQuery";
 import { Button } from "@/shared/ui/Button/Button";
+import { Modal } from "@/shared/ui/Modal/Modal";
 import { AIEvaluationCard } from "@/shared/ui/ReportSection/AIEvaluationCard/AIEvaluationCard";
 import { AnswerCard } from "@/shared/ui/ReportSection/AnswerCard/AnswerCard";
 import { FluencyCard } from "@/shared/ui/ReportSection/FluencyCard/FluencyCard";
@@ -16,125 +34,114 @@ import { SpeechCard } from "@/shared/ui/ReportSection/SpeechCard/SpeechCard";
 
 const InterviewReportPage = () => {
   const navigate = useNavigate();
-  const MOCK_DATA = {
-    header: {
-      folder: "2024 상반기 학급 학술 홍보",
-      date: "2024. 10. 24",
-    },
-    nonverbal: {
-      status: "안정적",
-      subtitle: "자세 유지",
-      description:
-        "어깨와 팔의 대칭이 안정적입니다. 강조 시 손 동작을 추가하면 더욱 효과적입니다.",
-    },
-    fluency: {
-      status: "High",
-      subtitle: "우수 단계",
-      description:
-        "불필요한 추임새 없이 문장 연결이 매우 매끄럽고 호흡이 안정적입니다.",
-    },
-    gaze: {
-      percentage: 88,
-      subtitle: "정면 응시율",
-      description:
-        "높은 응시율로 청중에게 신뢰감을 전달했으며 시선 배분이 일정합니다.",
-    },
-    speech: {
-      score: "92점",
-      scoreSubtitle: "적정성",
-      wpm: "135",
-      wpmSubtitle: "WPM",
-      description:
-        "전반적인 속도는 이상적이나, 결론 부분에서 속도가 빨라지는 점을 주의하세요.",
-    },
-    script: {
-      percentage: 90,
-      subtitle: "매우 높음",
-      description:
-        "대본 숙련도가 매우 높으며, 본인의 언어로 자연스럽게 전달하는 수준입니다. 암기보다는 이해도가 돋보입니다.",
-    },
-    answer: {
-      percentage: 85,
-      subtitle: "우수함",
-      description:
-        "질문의 의도를 정확히 파악하여 핵심 내용을 논리적으로 잘 전달했습니다. 구체적인 사례를 덧붙인 점이 좋습니다.",
-    },
-    aiEvaluation: {
-      overallReview:
-        "전체적인 전달력은 우수하지만, 결론부의 강조를 위한 완급 조절이 보완되면 완벽한 발표가 될 것입니다.",
-      strengths: [
-        "안정적인 시선 처리 및 청중 교감",
-        "자연스러운 제스처와 신체 언어",
-      ],
-      improvements: [
-        "적절한 포즈(Pause) 활용 필요",
-        "핵심 키워드 발음 시 강세 조절",
-      ],
-    },
-  };
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const { analysisId, folderTitle } =
+    (useLocation().state as ReportLocationState | null) ?? {};
+  const { data, isError, isLoading } = useAnalysisDetailQuery(analysisId);
+  const status = getReportStatus(analysisId, isError, isLoading, Boolean(data));
+  const closeVideoModal = () => setIsVideoModalOpen(false);
+
+  const handleVideoSave = () =>
+    !saveReportVideo(data?.videoUrl, data?.title) && setIsVideoModalOpen(true);
+
+  if (status || !data) {
+    return (
+      <div
+        className={`mx-auto w-full max-w-5xl px-4 py-20 text-center ${
+          status?.error ? "text-error-01" : "text-text-deactivated"
+        }`}
+      >
+        {status?.message}
+      </div>
+    );
+  }
+
+  const fluency = getFluencyStatus(data.fluencyLevel);
+  const review = getReportReview(data);
+
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12">
+    <div
+      data-print-report
+      className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12"
+    >
       <header className="mb-12 text-center">
         <h1 className="text-head-01 text-text-primary mb-4 tracking-tight">
           면접 분석 리포트
         </h1>
         <div className="text-label-03 text-text-tertiary flex justify-center gap-6">
-          <p>폴더명: {MOCK_DATA.header.folder}</p>
+          <p>폴더명: {folderTitle ?? data.title}</p>
           <div className="h-4 w-px bg-border-default" />
-          <p>일자: {MOCK_DATA.header.date}</p>
+          <p>일자: {formatReportDate(data.createdAt)}</p>
         </div>
       </header>
       <section className="mb-6 grid grid-cols-2 gap-6">
         <NonverbalCard
-          status={MOCK_DATA.nonverbal.status}
-          subtitle={MOCK_DATA.nonverbal.subtitle}
-          description={MOCK_DATA.nonverbal.description}
+          status={data.gestureFeedbackWord || "제스처"}
+          subtitle="비언어 표현"
+          description={
+            data.gestureFeedbackSentence || "비언어 표현 피드백이 없습니다."
+          }
         />
         <FluencyCard
-          status={MOCK_DATA.fluency.status}
-          subtitle={MOCK_DATA.fluency.subtitle}
-          description={MOCK_DATA.fluency.description}
+          status={fluency.status}
+          subtitle={fluency.subtitle}
+          description={data.fluencyFeedback || "발화 유창성 피드백이 없습니다."}
         />
         <GazeCard
-          percentage={MOCK_DATA.gaze.percentage}
-          subtitle={MOCK_DATA.gaze.subtitle}
-          description={MOCK_DATA.gaze.description}
+          percentage={data.gazeDistribution.camera}
+          subtitle="정면 응시율"
+          description={getScoreDescription(
+            data.gazeScore,
+            "높은 응시율로 면접관에게 신뢰감을 전달했으며 시선 배분이 일정합니다.",
+            `화면 응시 ${data.gazeDistribution.screen}%입니다. 카메라 응시 비율을 조금 더 높여보세요.`,
+          )}
         />
         <SpeechCard
-          score={MOCK_DATA.speech.score}
-          scoreSubtitle={MOCK_DATA.speech.scoreSubtitle}
-          wpm={MOCK_DATA.speech.wpm}
-          wpmSubtitle={MOCK_DATA.speech.wpmSubtitle}
-          description={MOCK_DATA.speech.description}
+          score={`${data.speedScore}점`}
+          scoreSubtitle="적절성"
+          wpm={`${data.speedDistribution.optimal}%`}
+          wpmSubtitle="적정 속도"
+          description={getSpeedDistributionDescription(data.speedDistribution)}
         />
       </section>
       <section className="mb-10 flex flex-col gap-6">
         <AnswerCard
-          percentage={MOCK_DATA.answer.percentage}
-          subtitle={MOCK_DATA.answer.subtitle}
-          description={MOCK_DATA.answer.description}
+          percentage={data.finalScore}
+          subtitle={getFinalStatus(data.finalScore)}
+          description={review.overallReview}
         />
         <AIEvaluationCard
-          overallReview={MOCK_DATA.aiEvaluation.overallReview}
-          strengths={MOCK_DATA.aiEvaluation.strengths}
-          improvements={MOCK_DATA.aiEvaluation.improvements}
+          overallReview={review.overallReview}
+          strengths={review.strengths}
+          improvements={review.improvements}
         />
       </section>
-      <div className="mb-12 flex justify-end gap-3">
-        <Button variant="outline" className="w-auto px-6">
+      <div data-print-hidden className="mb-12 flex justify-end gap-3">
+        <Button
+          variant="outline"
+          className="w-auto px-6"
+          onClick={saveReportPdf}
+        >
           <div className="flex items-center gap-2">
             <FileDown className="h-5 w-5" />
             <span>PDF 저장하기</span>
           </div>
         </Button>
-        <Button variant="primary" className="w-auto px-6">
+        <Button
+          variant="primary"
+          className="w-auto px-6"
+          onClick={handleVideoSave}
+        >
           <div className="flex items-center gap-2">
             <PlayCircle className="h-5 w-5" />
             <span>영상 저장하기</span>
           </div>
         </Button>
       </div>
-      <footer className="flex justify-center gap-4 border-t border-border-default pt-10">
+      <footer
+        data-print-hidden
+        className="flex justify-center gap-4 border-t border-border-default pt-10"
+      >
         <Button
           variant="outline"
           className="w-auto px-10"
@@ -156,6 +163,13 @@ const InterviewReportPage = () => {
           </div>
         </Button>
       </footer>
+      <Modal
+        isOpen={isVideoModalOpen}
+        title="영상 저장을 할 수 없습니다"
+        description={VIDEO_UNAVAILABLE_MESSAGE}
+        onClose={closeVideoModal}
+        onConfirm={closeVideoModal}
+      />
     </div>
   );
 };

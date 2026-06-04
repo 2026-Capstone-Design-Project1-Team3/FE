@@ -47,18 +47,20 @@ export interface RecordTableRowProps extends RecordAnalysis {
   variant: RecordTableRowVariant;
   title?: string;
   createdAt?: string;
+  folderTitle?: string;
 }
 
 export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
-  const { analysisId, variant, title, createdAt } = props;
+  const { analysisId, variant, title, createdAt, folderTitle } = props;
   const navigate = useNavigate();
   const { Icon, Color, Text } = variantConfigMap[variant];
-  const detailPath = `/report/${variant}/${analysisId}`;
+  const reportPath = `/${variant}/report`;
 
   const handleReportClick = () => {
-    navigate(detailPath, {
+    navigate(reportPath, {
       state: {
-        folderTitle: title || "제목 없음",
+        analysisId,
+        folderTitle,
         variant,
       },
     });
@@ -84,7 +86,7 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
           <button
             type="button"
             onClick={handleReportClick}
-            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-50"
+            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-700 hover:text-white"
           >
             리포트 보기
           </button>
