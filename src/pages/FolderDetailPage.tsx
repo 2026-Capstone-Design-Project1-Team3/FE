@@ -47,7 +47,6 @@ export const FolderDetailPage = () => {
     data?.cardnews.map(({ analysisId, createdAt, title }) => ({
       analysisId,
       createdAt,
-      folderTitle: stateFolderTitle ?? folderId ?? "폴더명",
       title,
       variant,
     })) ?? [];

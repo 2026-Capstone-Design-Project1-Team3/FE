@@ -6,25 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/utils/cn";
 
 type RecordTableRowVariant = "interview" | "presentation";
-type RecordType = 0 | 1;
-
-interface RecordAnalysis {
-  gazeScore?: number;
-  gazeDistribution?: {
-    screen: number;
-    camera: number;
-  };
-  fluencyLevel?: 0 | 1 | 2;
-  speedScore?: number;
-  speedDistribution?: {
-    fast: number;
-    optimal: number;
-    slow: number;
-  };
-  speedFeedback?: string;
-  finalScore?: number;
-  type?: RecordType;
-}
 
 const variantConfigMap: Record<
   RecordTableRowVariant,
@@ -42,7 +23,7 @@ const variantConfigMap: Record<
   },
 };
 
-export interface RecordTableRowProps extends RecordAnalysis {
+export interface RecordTableRowProps {
   analysisId: string;
   variant: RecordTableRowVariant;
   title?: string;
@@ -60,7 +41,7 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
     navigate(reportPath, {
       state: {
         analysisId,
-        folderTitle,
+        folderTitle: folderTitle ?? title,
         variant,
       },
     });
