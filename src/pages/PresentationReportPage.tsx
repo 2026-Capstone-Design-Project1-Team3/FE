@@ -12,9 +12,9 @@ import {
   formatReportDate,
   getFluencyStatus,
   getFinalStatus,
+  getGazeDescription,
   getReportReview,
   getReportStatus,
-  getScoreDescription,
   getSpeedDistributionDescription,
   saveReportPdf,
   saveReportVideo,
@@ -72,7 +72,7 @@ const PresentationReportPage = () => {
         <div className="flex justify-center gap-6 text-label-03 text-text-tertiary">
           <p>폴더명: {folderTitle ?? data.title}</p>
           <div className="h-4 w-px bg-border-default" />
-          <p>진행일: {formatReportDate(data.createdAt)}</p>
+          <p>일자: {formatReportDate(data.createdAt)}</p>
         </div>
       </header>
 
@@ -92,17 +92,16 @@ const PresentationReportPage = () => {
         <GazeCard
           percentage={data.gazeDistribution.camera}
           subtitle="정면 응시율"
-          description={getScoreDescription(
-            data.gazeScore,
-            "높은 응시율로 청중에게 신뢰감을 전달했으며 시선 배분이 일정합니다.",
-            `화면 응시 ${data.gazeDistribution.screen}%입니다. 카메라 응시 비율을 조금 더 높여보세요.`,
+          description={getGazeDescription(
+            data.gazeDistribution,
+            data.gazeFeedback,
           )}
         />
         <SpeechCard
           score={`${data.speedScore}점`}
           scoreSubtitle="적절성"
-          wpm={`${data.speedDistribution.optimal}%`}
-          wpmSubtitle="적정 속도"
+          wpm={`${data.speedSpm}`}
+          wpmSubtitle="SPM"
           description={getSpeedDistributionDescription(data.speedDistribution)}
         />
       </section>

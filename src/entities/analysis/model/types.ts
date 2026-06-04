@@ -31,6 +31,7 @@ export interface AnalysisDetailResponse {
   summary: string;
   createdAt: string;
   gazeScore: number;
+  gazeFeedback: string;
   gazeDistribution: {
     screen: number;
     camera: number;
@@ -38,6 +39,7 @@ export interface AnalysisDetailResponse {
   fluencyLevel: 0 | 1 | 2;
   fluencyFeedback: string;
   speedScore: number;
+  speedSpm: number;
   speedDistribution: {
     fast: number;
     optimal: number;

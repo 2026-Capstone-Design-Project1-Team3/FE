@@ -25,12 +25,6 @@ export const getFinalStatus = (score?: number) => {
   return "개선 필요";
 };
 
-export const getScoreDescription = (
-  score: number | undefined,
-  highText: string,
-  lowText: string,
-) => (clampScore(score) >= 70 ? highText : lowText);
-
 export const getReportStatus = (
   analysisId: string | undefined,
   isError: boolean,
@@ -145,8 +139,17 @@ export const saveReportVideo = (videoUrl?: string, title = "report-video") => {
   return true;
 };
 
+export const getGazeDescription = (
+  { camera, screen }: AnalysisDetailResponse["gazeDistribution"],
+  feedback: string,
+) =>
+  `카메라 응시 ${camera}%, 화면 응시 ${screen}%입니다. ${
+    feedback || "시선 처리 피드백이 없습니다."
+  }`;
+
 export const getSpeedDistributionDescription = ({
   fast,
+  optimal,
   slow,
 }: AnalysisDetailResponse["speedDistribution"]) =>
-  `빠른 구간은 ${fast}%, 느린 구간은 ${slow}%였습니다. 빠른 구간이 있다면 결론부에서 완급 조절을 신경 써보세요.`;
+  `적정 속도 구간은 ${optimal}%, 빠른 구간은 ${fast}%, 느린 구간은 ${slow}%였습니다.`;
