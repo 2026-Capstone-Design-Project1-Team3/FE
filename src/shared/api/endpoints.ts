@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
     base: "/folder", // GET (목록 조회), POST (생성)
     delete: "/folder/delete",
     outputText: "/folder/outputText",
+    detail: (folderId: string) => `/folder/${folderId}`,
     setting: (folderId: string) => `/folder/setting/${folderId}`,
     statistics: (folderId: string) => `/folder/statistics/${folderId}`,
   },

@@ -1,10 +1,12 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import type { FolderDetailResponse } from "@/entities/folder/model/types";
 import { useUploadPdfFileMutation } from "@/features/file/model/useUploadPdfFileMutation";
 import { useCreateFolderMutation } from "@/features/folder/model/useCreateFolderMutation";
+import { useFolderDetailQuery } from "@/features/folder/model/useFolderDetailQuery";
 import { useFolderListQuery } from "@/features/folder/model/useFolderListQuery";
 import { Button } from "@/shared/ui/Button/Button";
 import { FileUploadCard } from "@/shared/ui/PrepareSection/FileUploadCard/FileUploadCard";
@@ -16,6 +18,7 @@ import { SelectPracticeCard } from "@/shared/ui/PrepareSection/SelectPracticeCar
 import { TextInput } from "@/shared/ui/TextInput/TextInput";
 
 const INTERVIEW_TYPE = 1;
+const RESUME_MAX_LENGTH = 4000;
 
 export const InterviewPreparePage = () => {
   const navigate = useNavigate();
@@ -24,18 +27,21 @@ export const InterviewPreparePage = () => {
   );
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-  const [selectedFolderTitle, setSelectedFolderTitle] = useState("");
+  const [localDetail, setLocalDetail] = useState<FolderDetailResponse | null>(
+    null,
+  );
   const [interviewTitle, setInterviewTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [jobRole, setJobRole] = useState("");
   const [resumeText, setResumeText] = useState("");
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
 
-  const { data: folders = [] } = useFolderListQuery({
-    type: INTERVIEW_TYPE,
-  });
+  const { data: folders = [] } = useFolderListQuery({ type: INTERVIEW_TYPE });
+  const { data: fetchedDetail } = useFolderDetailQuery(selectedFolderId);
   const uploadPdfMutation = useUploadPdfFileMutation();
   const createFolderMutation = useCreateFolderMutation();
+
+  const folderDetail = localDetail ?? fetchedDetail;
 
   const isSubmitting =
     uploadPdfMutation.isPending || createFolderMutation.isPending;
@@ -48,14 +54,13 @@ export const InterviewPreparePage = () => {
   }));
 
   const handleSelectFolder = (folderId: string) => {
-    const folder = folders.find((item) => item.folderId === folderId);
+    setLocalDetail(null);
     setSelectedFolderId(folderId);
-    setSelectedFolderTitle(folder?.title ?? "");
     setSelectedPractice("existing");
   };
 
   const handleStartExisting = () => {
-    if (!selectedFolderId) {
+    if (!selectedFolderId && !localDetail) {
       toast.error("이어갈 면접 폴더를 선택해 주세요.");
       return;
     }
@@ -103,6 +108,15 @@ export const InterviewPreparePage = () => {
         type: INTERVIEW_TYPE,
       });
 
+      setLocalDetail({
+        title: interviewTitle.trim(),
+        fileName: portfolioFile.name,
+        extraInfo: jobRole.trim(),
+        companyName: companyName.trim(),
+        inputText: resumeText.trim(),
+      });
+      setSelectedFolderId(null);
+      setSelectedPractice("existing");
       toast.success("면접 연습이 생성되었습니다.");
     } catch (error) {
       console.error(error);
@@ -138,7 +152,7 @@ export const InterviewPreparePage = () => {
         <SelectPracticeCard
           variant="existing"
           practiceType="interview"
-          folderName={selectedFolderTitle}
+          folderName={folderDetail?.title ?? ""}
           isSelected={selectedPractice === "existing"}
           onClick={() => setSelectedPractice("existing")}
           onListClick={(e) => {
@@ -166,7 +180,7 @@ export const InterviewPreparePage = () => {
               placeholder="예: 구글코리아 프론트엔드 면접"
               value={
                 selectedPractice === "existing"
-                  ? selectedFolderTitle
+                  ? (folderDetail?.title ?? "")
                   : interviewTitle
               }
               disabled={selectedPractice === "existing"}
@@ -181,7 +195,11 @@ export const InterviewPreparePage = () => {
                 id="companyName"
                 label="지원 회사"
                 placeholder="예: 구글코리아"
-                value={selectedPractice === "existing" ? "" : companyName}
+                value={
+                  selectedPractice === "existing"
+                    ? (folderDetail?.companyName ?? "")
+                    : companyName
+                }
                 disabled={selectedPractice === "existing"}
                 required={false}
                 onChange={(e) => setCompanyName(e.target.value)}
@@ -192,7 +210,11 @@ export const InterviewPreparePage = () => {
                 id="jobRole"
                 label="지원 직무"
                 placeholder="예: 프론트엔드 개발자"
-                value={selectedPractice === "existing" ? "" : jobRole}
+                value={
+                  selectedPractice === "existing"
+                    ? (folderDetail?.extraInfo ?? "")
+                    : jobRole
+                }
                 disabled={selectedPractice === "existing"}
                 required={false}
                 onChange={(e) => setJobRole(e.target.value)}
@@ -221,9 +243,15 @@ export const InterviewPreparePage = () => {
                   id="resumeText"
                   className="mt-2 h-60 w-full resize-none rounded-xl border border-border-deactivated bg-white p-4 text-label-02 text-text-primary outline-none focus:border-primary-900 focus:ring-4 focus:ring-primary-100"
                   placeholder="자기소개서 내용을 붙여넣어 주세요."
+                  maxLength={RESUME_MAX_LENGTH}
                   value={resumeText}
                   onChange={(e) => setResumeText(e.target.value)}
                 />
+                <div className="flex justify-end mt-1 px-1">
+                  <span className="text-caption-01 text-text-tertiary">
+                    {resumeText.length} / {RESUME_MAX_LENGTH}자
+                  </span>
+                </div>
               </div>
             </>
           )}
@@ -234,7 +262,7 @@ export const InterviewPreparePage = () => {
                 <FileUploadCard
                   title="포트폴리오"
                   variant="readonly"
-                  fileName="기존 포트폴리오"
+                  fileName={folderDetail?.fileName ?? "기존 포트폴리오"}
                   fileSize={0}
                 />
               </div>
@@ -248,7 +276,7 @@ export const InterviewPreparePage = () => {
                 <textarea
                   id="existingResumeText"
                   className="mt-2 h-60 w-full resize-none rounded-xl border border-border-deactivated bg-background-dark p-4 text-label-02 text-text-secondary outline-none"
-                  value="기존 자기소개서는 연습 시작 시 불러옵니다."
+                  value={folderDetail?.inputText ?? ""}
                   disabled
                   readOnly
                 />
@@ -270,7 +298,9 @@ export const InterviewPreparePage = () => {
               >
                 {selectedPractice === "existing"
                   ? "연습 시작하기"
-                  : "연습 생성하기"}
+                  : isSubmitting
+                    ? "연습 생성 중..."
+                    : "연습 생성하기"}
               </Button>
             </div>
           </div>

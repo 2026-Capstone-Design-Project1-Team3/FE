@@ -41,6 +41,14 @@ export interface FolderInfo {
   totalAnalyses: number;
 }
 
+export interface FolderDetailResponse {
+  title: string;
+  fileName: string;
+  extraInfo: string;
+  companyName: string;
+  inputText: string;
+}
+
 export type FolderListResponse = FolderInfo[];
 
 export interface FolderSettingResponse {

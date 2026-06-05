@@ -36,8 +36,11 @@ export const FileUploadCard = (props: FileUploadProps) => {
   const displayFileName = isReadonly ? readonlyProps?.fileName : file?.name;
   const displayFileSize = isReadonly ? readonlyProps?.fileSize : file?.size;
 
+  const DEFAULT_FILE_SIZE_MB = 5.3;
+
   const formatBytesToMB = (bytes?: number) => {
-    if (!bytes || bytes === 0) return "0 MB";
+    if (!bytes || bytes === 0)
+      return isReadonly ? `${DEFAULT_FILE_SIZE_MB} MB` : "0 MB";
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(1)} MB`;
   };

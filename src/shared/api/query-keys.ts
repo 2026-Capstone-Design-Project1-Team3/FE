@@ -20,6 +20,7 @@ export const queryKeys = {
   folder: {
     all: ["folder"] as const,
     list: (params?: FolderListParams) => ["folder", "list", params] as const,
+    detail: (folderId: string) => ["folder", "detail", folderId] as const,
     setting: (folderId: string) => ["folder", "setting", folderId] as const,
     statistics: (folderId: string) =>
       ["folder", "statistics", folderId] as const,

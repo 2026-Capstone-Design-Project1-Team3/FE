@@ -4,8 +4,10 @@ import { Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import type { FolderDetailResponse } from "@/entities/folder/model/types";
 import { useUploadPdfFileMutation } from "@/features/file/model/useUploadPdfFileMutation";
 import { useCreateFolderMutation } from "@/features/folder/model/useCreateFolderMutation";
+import { useFolderDetailQuery } from "@/features/folder/model/useFolderDetailQuery";
 import { useFolderListQuery } from "@/features/folder/model/useFolderListQuery";
 import { useGenerateScriptMutation } from "@/features/folder/model/useGenerateScriptMutation";
 import { Button } from "@/shared/ui/Button/Button";
@@ -32,7 +34,9 @@ export const PresentationPreparePage = () => {
   );
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-  const [selectedFolderTitle, setSelectedFolderTitle] = useState("");
+  const [localDetail, setLocalDetail] = useState<FolderDetailResponse | null>(
+    null,
+  );
   const [title, setTitle] = useState("");
   const [presentationFile, setPresentationFile] = useState<File | null>(null);
   const [scriptMethod, setScriptMethod] = useState<ScriptMethodType | null>(
@@ -53,6 +57,8 @@ export const PresentationPreparePage = () => {
   const { data: folders = [] } = useFolderListQuery({
     type: PRESENTATION_TYPE,
   });
+  const { data: fetchedDetail } = useFolderDetailQuery(selectedFolderId);
+  const folderDetail = localDetail ?? fetchedDetail;
   const uploadPdfMutation = useUploadPdfFileMutation();
   const createFolderMutation = useCreateFolderMutation();
   const generateScriptMutation = useGenerateScriptMutation();
@@ -68,9 +74,8 @@ export const PresentationPreparePage = () => {
   }));
 
   const handleSelectFolder = (folderId: string) => {
-    const folder = folders.find((item) => item.folderId === folderId);
+    setLocalDetail(null);
     setSelectedFolderId(folderId);
-    setSelectedFolderTitle(folder?.title ?? "");
     setSelectedPractice("existing");
   };
 
@@ -188,6 +193,15 @@ export const PresentationPreparePage = () => {
         type: PRESENTATION_TYPE,
       });
 
+      setLocalDetail({
+        title: title.trim(),
+        fileName: presentationFile!.name,
+        extraInfo: script.trim(),
+        companyName: "",
+        inputText: "",
+      });
+      setSelectedFolderId(null);
+      setSelectedPractice("existing");
       toast.success("발표 연습이 생성되었습니다.");
     } catch (error) {
       console.error(error);
@@ -223,7 +237,7 @@ export const PresentationPreparePage = () => {
         <SelectPracticeCard
           variant="existing"
           practiceType="presentation"
-          folderName={selectedFolderTitle}
+          folderName={folderDetail?.title ?? ""}
           isSelected={selectedPractice === "existing"}
           onClick={() => setSelectedPractice("existing")}
           onListClick={(e) => {
@@ -250,7 +264,9 @@ export const PresentationPreparePage = () => {
               label="발표 제목"
               placeholder="예: 2026 상반기 경영 전략 보고"
               value={
-                selectedPractice === "existing" ? selectedFolderTitle : title
+                selectedPractice === "existing"
+                  ? (folderDetail?.title ?? "")
+                  : title
               }
               disabled={selectedPractice === "existing"}
               required={false}
@@ -271,7 +287,7 @@ export const PresentationPreparePage = () => {
                 <FileUploadCard
                   title="발표 자료"
                   variant="readonly"
-                  fileName="기존 발표 자료"
+                  fileName={folderDetail?.fileName ?? "기존 발표 자료"}
                   fileSize={0}
                 />
               )}
@@ -289,7 +305,7 @@ export const PresentationPreparePage = () => {
               <textarea
                 id="existingPresentationScript"
                 className="mt-2 h-60 w-full resize-none rounded-xl border border-border-deactivated bg-background-dark p-4 text-label-02 text-text-secondary outline-none"
-                value="기존 발표 대본은 연습 시작 시 불러옵니다."
+                value={folderDetail?.extraInfo ?? ""}
                 disabled
                 readOnly
               />
@@ -374,7 +390,9 @@ export const PresentationPreparePage = () => {
               >
                 {selectedPractice === "existing"
                   ? "연습 시작하기"
-                  : "연습 생성하기"}
+                  : isSubmitting
+                    ? "연습 생성 중..."
+                    : "연습 생성하기"}
               </Button>
             </div>
           </div>
