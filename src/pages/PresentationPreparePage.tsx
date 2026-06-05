@@ -4,6 +4,7 @@ import { Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import { getFolderSetting } from "@/entities/folder/api/getFolderSetting";
 import type { FolderDetailResponse } from "@/entities/folder/model/types";
 import { useUploadPdfFileMutation } from "@/features/file/model/useUploadPdfFileMutation";
 import { useCreateFolderMutation } from "@/features/folder/model/useCreateFolderMutation";
@@ -11,6 +12,7 @@ import { useFolderDetailQuery } from "@/features/folder/model/useFolderDetailQue
 import { useFolderListQuery } from "@/features/folder/model/useFolderListQuery";
 import { useGenerateScriptMutation } from "@/features/folder/model/useGenerateScriptMutation";
 import { Button } from "@/shared/ui/Button/Button";
+import { Modal } from "@/shared/ui/Modal/Modal";
 import { EditorModal } from "@/shared/ui/PrepareSection/EditorModal/EditorModal";
 import { FileUploadCard } from "@/shared/ui/PrepareSection/FileUploadCard/FileUploadCard";
 import {
@@ -33,6 +35,8 @@ export const PresentationPreparePage = () => {
     "new",
   );
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [isCalibrationModalOpen, setIsCalibrationModalOpen] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [localDetail, setLocalDetail] = useState<FolderDetailResponse | null>(
     null,
@@ -149,14 +153,35 @@ export const PresentationPreparePage = () => {
     setIsEditorModalOpen(false);
   };
 
-  const handleStartExisting = () => {
-    if (!selectedFolderId) {
+  const handleStartExisting = async () => {
+    if (!selectedFolderId && !localDetail) {
       toast.error("이어갈 발표 폴더를 선택해 주세요.");
       return;
     }
 
+    setIsStarting(true);
+    let setting;
+    try {
+      setting = await getFolderSetting(selectedFolderId!);
+      if (!setting.eyeCalibration) {
+        setIsCalibrationModalOpen(true);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("연습 준비 중 오류가 발생했습니다.");
+      return;
+    } finally {
+      setIsStarting(false);
+    }
+
     navigate("/presentation/record", {
-      state: { folderId: selectedFolderId, type: PRESENTATION_TYPE },
+      state: {
+        folderId: selectedFolderId,
+        type: PRESENTATION_TYPE,
+        setting,
+        folderDetail,
+      },
     });
   };
 
@@ -211,7 +236,7 @@ export const PresentationPreparePage = () => {
 
   const handleSubmit = () => {
     if (selectedPractice === "existing") {
-      handleStartExisting();
+      void handleStartExisting();
       return;
     }
 
@@ -389,7 +414,9 @@ export const PresentationPreparePage = () => {
                 onClick={handleSubmit}
               >
                 {selectedPractice === "existing"
-                  ? "연습 시작하기"
+                  ? isStarting
+                    ? "연습 시작 중..."
+                    : "연습 시작하기"
                   : isSubmitting
                     ? "연습 생성 중..."
                     : "연습 생성하기"}
@@ -413,6 +440,17 @@ export const PresentationPreparePage = () => {
         enhancedScript={enhancedScript}
         onClose={() => setIsEditorModalOpen(false)}
         onSave={handleEditorSave}
+      />
+
+      <Modal
+        isOpen={isCalibrationModalOpen}
+        variant="double"
+        title="캘리브레이션 미설정"
+        description="마이페이지에서 먼저 캘리브레이션 설정을 진행해 주세요."
+        cancelText="닫기"
+        confirmText="마이페이지로"
+        onClose={() => setIsCalibrationModalOpen(false)}
+        onConfirm={() => navigate("/my")}
       />
     </div>
   );

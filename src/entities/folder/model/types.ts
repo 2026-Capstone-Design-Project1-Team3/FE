@@ -51,8 +51,15 @@ export interface FolderDetailResponse {
 
 export type FolderListResponse = FolderInfo[];
 
+export interface EyeCalibration {
+  leftEyeOffset: number;
+  rightEyeOffset: number;
+  ratio: number;
+}
+
 export interface FolderSettingResponse {
   set: string;
+  eyeCalibration: EyeCalibration | null;
 }
 
 export interface FolderStatisticsResponse {

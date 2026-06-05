@@ -102,7 +102,7 @@ export const SelectPracticeCard = (props: SelectPracticeCardProps) => {
   return (
     <div
       className={`${baseCardClass} ${selectedClass}`.trim()}
-      onClick={onClick}
+      onClick={variant === "new" ? onClick : undefined}
     >
       {variant === "new" ? (
         <NewPracticeContent
