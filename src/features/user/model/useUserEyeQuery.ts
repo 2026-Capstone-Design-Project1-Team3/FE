@@ -7,5 +7,6 @@ export const useUserEyeQuery = () => {
   return useQuery({
     queryFn: getEye,
     queryKey: queryKeys.user.eye(),
+    refetchOnMount: "always",
   });
 };
