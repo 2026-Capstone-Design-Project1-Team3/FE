@@ -24,9 +24,41 @@ export interface CardNewsResponse {
 }
 
 export interface AnalysisDetailResponse {
-  [key: string]: unknown;
+  analysisId: string;
+  folderId: string;
+  title: string;
+  type: number;
+  summary: string;
+  createdAt: string;
+  gazeScore: number;
+  gazeFeedback: string;
+  gazeDistribution: {
+    screen: number;
+    camera: number;
+  };
+  fluencyLevel: 0 | 1 | 2;
+  fluencyFeedback: string;
+  speedScore: number;
+  speedSpm: number;
+  speedDistribution: {
+    fast: number;
+    optimal: number;
+    slow: number;
+  };
+  gestureFeedbackWord: string;
+  gestureFeedbackSentence: string;
+  finalScore: number;
+  finalFeedback: string;
+  transcript: string;
+  videoUrl?: string;
+}
+
+export interface AnalysisStatisticItem {
+  gazeScore: number;
+  speedScore: number;
 }
 
 export interface AnalysisStatisticsResponse {
-  [key: string]: unknown;
+  total: number;
+  statistics: AnalysisStatisticItem[];
 }

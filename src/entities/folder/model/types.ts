@@ -6,6 +6,14 @@ export type FolderListQuery = {
   keyWord?: string;
 };
 
+export interface FolderInfo {
+  folderId: string;
+  title: string;
+  type: number;
+  updatedAt: string;
+  totalAnalyses: number;
+}
+
 export interface CreateFolderRequest {
   title: string;
   fileName: string;
@@ -33,14 +41,6 @@ export interface DeleteFolderRequest {
   folderId?: string[];
 }
 
-export interface FolderInfo {
-  folderId: string;
-  title: string;
-  type: number;
-  updatedAt: string;
-  totalAnalyses: number;
-}
-
 export interface FolderDetailResponse {
   title: string;
   fileName: string;
@@ -63,5 +63,7 @@ export interface FolderSettingResponse {
 }
 
 export interface FolderStatisticsResponse {
-  [key: string]: unknown;
+  gazeScore: number;
+  speedScore: number;
+  finalScore: number;
 }

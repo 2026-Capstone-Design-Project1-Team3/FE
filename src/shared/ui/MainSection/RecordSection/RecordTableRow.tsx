@@ -6,25 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/utils/cn";
 
 type RecordTableRowVariant = "interview" | "presentation";
-type RecordType = 0 | 1;
-
-interface RecordAnalysis {
-  gazeScore?: number;
-  gazeDistribution?: {
-    screen: number;
-    camera: number;
-  };
-  fluencyLevel?: 0 | 1 | 2;
-  speedScore?: number;
-  speedDistribution?: {
-    fast: number;
-    optimal: number;
-    slow: number;
-  };
-  speedFeedback?: string;
-  finalScore?: number;
-  type?: RecordType;
-}
 
 const variantConfigMap: Record<
   RecordTableRowVariant,
@@ -42,23 +23,25 @@ const variantConfigMap: Record<
   },
 };
 
-export interface RecordTableRowProps extends RecordAnalysis {
+export interface RecordTableRowProps {
   analysisId: string;
   variant: RecordTableRowVariant;
   title?: string;
   createdAt?: string;
+  folderTitle?: string;
 }
 
 export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
-  const { analysisId, variant, title, createdAt } = props;
+  const { analysisId, variant, title, createdAt, folderTitle } = props;
   const navigate = useNavigate();
   const { Icon, Color, Text } = variantConfigMap[variant];
-  const detailPath = `/report/${variant}/${analysisId}`;
+  const reportPath = `/${variant}/report`;
 
   const handleReportClick = () => {
-    navigate(detailPath, {
+    navigate(reportPath, {
       state: {
-        folderTitle: title || "제목 없음",
+        analysisId,
+        folderTitle: folderTitle ?? title,
         variant,
       },
     });
@@ -84,7 +67,7 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
           <button
             type="button"
             onClick={handleReportClick}
-            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-50"
+            className="text-label-04 min-w-25 cursor-pointer rounded-xl border border-primary-700 p-2 text-primary-700 hover:bg-primary-700 hover:text-white"
           >
             리포트 보기
           </button>

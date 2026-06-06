@@ -1,4 +1,4 @@
-import { useMemo, useState, type FC } from "react";
+import { useState, type FC } from "react";
 
 import {
   RecordTableRow,
@@ -27,15 +27,14 @@ export const FolderTable: FC<FolderTableProps> = ({
   className,
 }) => {
   const [internalPage, setInternalPage] = useState(defaultPage);
+  const isControlledPagination = currentPage !== undefined;
   const activePage = currentPage ?? internalPage;
   const pageCount =
     totalPages ?? Math.max(1, Math.ceil(records.length / itemsPerPage));
-
-  const paginatedRecords = useMemo(() => {
-    const startIndex = (activePage - 1) * itemsPerPage;
-
-    return records.slice(startIndex, startIndex + itemsPerPage);
-  }, [activePage, itemsPerPage, records]);
+  const startIndex = (activePage - 1) * itemsPerPage;
+  const visibleRecords = isControlledPagination
+    ? records
+    : records.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePageChange = (page: number) => {
     if (currentPage === undefined) {
@@ -47,38 +46,35 @@ export const FolderTable: FC<FolderTableProps> = ({
 
   return (
     <section className={cn("w-full", className)}>
-      <table className="w-full border-separate border-spacing-y-3">
-        <thead>
-          <tr className="text-label-01 text-text-deactivated">
-            <th className="px-6 py-1 text-left">연습 세션 및 폴더명</th>
-            <th className="px-6 py-1 text-center">마지막 연습 일자</th>
-            <th className="px-6 py-1 text-right">비디오 수</th>
-          </tr>
-          <tr aria-hidden="true">
-            <th colSpan={3}>
-              <div className="bg-border-default h-px w-full" />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedRecords.length > 0 ? (
-            paginatedRecords.map((record) => (
-              <RecordTableRow key={record.folderId} {...record} />
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan={3}
-                className="text-body-02 border-border-default bg-background-light text-text-deactivated rounded-xl border py-20 text-center"
-              >
-                기록이 없습니다.
-              </td>
+      <div className="overflow-hidden rounded-2xl border border-border-default bg-background-light">
+        <table className="w-full">
+          <thead className="border-b border-border-default">
+            <tr className="text-label-01 text-text-deactivated">
+              <th className="px-6 py-4 text-left">연습 세션 및 폴더명</th>
+              <th className="px-6 py-4 text-center">마지막 연습 일자</th>
+              <th className="px-6 py-4 text-right">비디오 수</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-border-deactivated">
+            {visibleRecords.length > 0 ? (
+              visibleRecords.map((record) => (
+                <RecordTableRow key={record.folderId} {...record} />
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="text-body-02 py-20 text-center text-text-deactivated"
+                >
+                  기록이 없습니다.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      {pageCount > 1 ? (
+      {totalPages !== undefined || pageCount > 1 ? (
         <Pagination
           currentPage={activePage}
           totalPages={pageCount}

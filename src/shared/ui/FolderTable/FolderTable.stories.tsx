@@ -80,3 +80,25 @@ export const Default: Story = {
     itemsPerPage: 5,
   },
 };
+
+export const Disabled: Story = {
+  args: {
+    records: [],
+  },
+};
+
+export const EdgeCase: Story = {
+  args: {
+    records: [
+      {
+        folderId: "folder-long-title",
+        variant: "presentation",
+        title:
+          "매우 긴 폴더명과 긴 설명이 함께 들어오는 발표 연습 기록 테이블 표시 확인",
+        subTitle: "긴 보조 설명이 들어와도 한 줄로 안정적으로 잘립니다.",
+        createAt: "날짜 정보 없음",
+        videoCount: 999,
+      },
+    ],
+  },
+};

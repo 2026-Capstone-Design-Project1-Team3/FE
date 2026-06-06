@@ -5,10 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 import { cn } from "@/utils/cn";
 
-interface RecordAnalysis {
-  videoCount?: number;
-}
-
 type RecordTableRowVariant = "interview" | "presentation";
 
 const variantIconColorMap: Record<RecordTableRowVariant, string> = {
@@ -16,31 +12,34 @@ const variantIconColorMap: Record<RecordTableRowVariant, string> = {
   presentation: "bg-secondary-100 text-secondary-900",
 };
 
-export interface RecordTableRowProps extends RecordAnalysis {
+const cellClass =
+  "bg-background-light group-hover:bg-gray-50 group-focus-visible:bg-gray-50 px-6 py-5 transition-colors";
+
+export interface RecordTableRowProps {
   folderId: string;
   variant: RecordTableRowVariant;
   title?: string;
   subTitle?: string;
   createAt?: string;
+  videoCount?: number;
 }
 
-export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
-  const {
-    folderId,
-    variant,
-    title,
-    subTitle,
-    createAt,
-    videoCount = 0,
-  } = props;
+export const RecordTableRow: FC<RecordTableRowProps> = ({
+  folderId,
+  variant,
+  title,
+  subTitle,
+  createAt,
+  videoCount = 0,
+}) => {
   const navigate = useNavigate();
-  const detailPath = `/report/${variant}/${folderId}`;
   const iconColor = variantIconColorMap[variant];
+  const titleText = title || "제목 없음";
 
   const handleNavigate = () => {
-    navigate(detailPath, {
+    navigate(`/report/${variant}/${folderId}`, {
       state: {
-        folderTitle: title || "제목 없음",
+        folderTitle: titleText,
         variant,
       },
     });
@@ -49,11 +48,11 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
   return (
     <tr
       key={folderId}
-      aria-label={`${title || "제목 없음"} 폴더 상세 보기`}
+      aria-label={`${titleText} 폴더 상세 보기`}
       onClick={handleNavigate}
       className="group cursor-pointer outline-none"
     >
-      <td className="border-border-default bg-background-light group-hover:bg-primary-900/10 group-focus-visible:bg-primary-50 rounded-l-xl border-y border-l px-6 py-5 transition-colors">
+      <td className={cellClass}>
         <div className="flex items-center gap-4">
           <span
             className={cn(
@@ -65,7 +64,7 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
           </span>
           <div className="min-w-0">
             <p className="text-body-01 text-text-primary line-clamp-1">
-              {title || "제목 없음"}
+              {titleText}
             </p>
             {subTitle ? (
               <p className="text-body-03 text-text-deactivated line-clamp-1">
@@ -75,10 +74,17 @@ export const RecordTableRow: FC<RecordTableRowProps> = (props) => {
           </div>
         </div>
       </td>
-      <td className="text-body-01 border-border-default bg-background-light text-text-secondary group-hover:bg-primary-900/10 group-focus-visible:bg-primary-50 border-y px-6 py-5 text-center transition-colors">
+      <td
+        className={cn(
+          cellClass,
+          "text-body-01 text-text-secondary text-center",
+        )}
+      >
         {createAt || "--"}
       </td>
-      <td className="text-body-02 border-border-default bg-background-light text-text-secondary group-hover:bg-primary-900/10 group-focus-visible:bg-primary-50 rounded-r-xl border-y border-r px-6 py-5 text-right transition-colors">
+      <td
+        className={cn(cellClass, "text-body-02 text-text-secondary text-right")}
+      >
         <span className="inline-flex items-center justify-end gap-1">
           <Images size={18} strokeWidth={2} />
           {videoCount}개의 영상
