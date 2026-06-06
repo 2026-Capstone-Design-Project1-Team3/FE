@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
     cardNews: "/analysis/cardNews",
     detail: (analysisId: string) => `/analysis/${analysisId}`,
     statistics: (limit: number) => `/analysis/statistics/${limit}`,
+    alarm: "/analysis/alarm",
   },
   file: {
     presignedUrl: (fileName: string) =>

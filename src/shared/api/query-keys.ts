@@ -27,7 +27,8 @@ export const queryKeys = {
   },
   analysis: {
     all: ["analysis"] as const,
-    detail: (analysisId: string) => ["analysis", "detail", analysisId] as const,
+    detail: (analysisId: string | null) =>
+      ["analysis", "detail", analysisId] as const,
     statistics: (limit: number) => ["analysis", "statistics", limit] as const,
     cardNews: (params?: CardNewsParams) =>
       ["analysis", "cardNews", params] as const,

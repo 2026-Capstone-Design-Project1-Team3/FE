@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import {
   ClipboardList,
   FileDown,
@@ -8,23 +6,8 @@ import {
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import {
-  formatReportDate,
-  getFluencyStatus,
-  getFinalStatus,
-  getGazeDescription,
-  getReportReview,
-  getReportStatus,
-  getSpeedDistributionDescription,
-  saveReportPdf,
-  saveReportVideo,
-  type ReportLocationState,
-  VIDEO_UNAVAILABLE_MESSAGE,
-} from "./reportDetailUtils";
-
 import { useAnalysisDetailQuery } from "@/features/analysis/model/useAnalysisDetailQuery";
 import { Button } from "@/shared/ui/Button/Button";
-import { Modal } from "@/shared/ui/Modal/Modal";
 import { AIEvaluationCard } from "@/shared/ui/ReportSection/AIEvaluationCard/AIEvaluationCard";
 import { FluencyCard } from "@/shared/ui/ReportSection/FluencyCard/FluencyCard";
 import { GazeCard } from "@/shared/ui/ReportSection/GazeCard/GazeCard";
@@ -32,109 +15,116 @@ import { NonverbalCard } from "@/shared/ui/ReportSection/NonverbalCard/Nonverbal
 import { ScriptSimilarityCard } from "@/shared/ui/ReportSection/ScriptSimilarityCard/ScriptSimilarityCard";
 import { SpeechCard } from "@/shared/ui/ReportSection/SpeechCard/SpeechCard";
 
+const FLUENCY_SUBTITLE = ["개선 필요", "보통 단계", "우수 단계"];
+const FLUENCY_STATUS = ["Low", "Mid", "High"];
+
+const getScoreSubtitle = (score: number) => {
+  if (score >= 90) return "매우 높음";
+  if (score >= 70) return "높음";
+  if (score >= 50) return "보통";
+  return "낮음";
+};
+
+const getScriptDescription = (score: number) => {
+  if (score >= 90)
+    return "대본 숙련도가 매우 높으며, 자연스럽게 전달하는 수준입니다.";
+  if (score >= 70) return "대본을 잘 숙지하고 있으며, 전달이 자연스럽습니다.";
+  if (score >= 50)
+    return "대본의 핵심 내용은 전달되었으나, 더 많은 연습이 권장됩니다.";
+  return "대본 숙달이 더 필요합니다. 핵심 키워드 중심으로 연습하세요.";
+};
+
+const parseFinalFeedback = (feedback: string) => {
+  const parts = feedback.split("<q>").map((s) => s.trim());
+  return {
+    overallReview: parts[0] ?? "",
+    strengths: [parts[1] ?? "", parts[2] ?? ""].filter(Boolean),
+    improvements: [parts[3] ?? "", parts[4] ?? ""].filter(Boolean),
+  };
+};
+
 const PresentationReportPage = () => {
   const navigate = useNavigate();
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const { analysisId, folderTitle } =
-    (useLocation().state as ReportLocationState | null) ?? {};
-  const { data, isError, isLoading } = useAnalysisDetailQuery(analysisId);
-  const status = getReportStatus(analysisId, isError, isLoading, Boolean(data));
+  const location = useLocation();
+  const { analysisId } = (location.state ?? {}) as { analysisId?: string };
 
-  const closeVideoModal = () => setIsVideoModalOpen(false);
+  const { data, isLoading } = useAnalysisDetailQuery(analysisId ?? null);
 
-  const handleVideoSave = () =>
-    !saveReportVideo(data?.videoUrl, data?.title) && setIsVideoModalOpen(true);
-
-  if (status || !data) {
+  if (isLoading || !data) {
     return (
-      <div
-        className={`mx-auto w-full max-w-5xl px-4 py-20 text-center ${
-          status?.error ? "text-error-01" : "text-text-deactivated"
-        }`}
-      >
-        {status?.message}
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="text-body-01 text-text-secondary animate-pulse">
+          리포트를 불러오는 중...
+        </span>
       </div>
     );
   }
 
-  const fluency = getFluencyStatus(data.fluencyLevel);
-  const review = getReportReview(data);
+  const fluencyIdx = Math.min(Math.max(data.fluencyLevel, 0), 2);
+  const { overallReview, strengths, improvements } = parseFinalFeedback(
+    data.finalFeedback,
+  );
+  const speedDesc = `빠름 ${data.speedDistribution.fast}% / 적정 ${data.speedDistribution.optimal}% / 느림 ${data.speedDistribution.slow}%`;
 
   return (
-    <div
-      data-print-report
-      className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12"
-    >
+    <div className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12">
       <header className="mb-12 text-center">
         <h1 className="mb-4 text-head-01 tracking-tight text-text-primary">
           발표 분석 리포트
         </h1>
         <div className="flex justify-center gap-6 text-label-03 text-text-tertiary">
-          <p>폴더명: {folderTitle ?? data.title}</p>
+          <p>폴더명: {data.title}</p>
           <div className="h-4 w-px bg-border-default" />
-          <p>일자: {formatReportDate(data.createdAt)}</p>
+          <p>일자: {data.createdAt.slice(0, 10).replace(/-/g, ".")}</p>
         </div>
       </header>
 
       <section className="mb-6 grid grid-cols-2 gap-6">
         <NonverbalCard
-          status={data.gestureFeedbackWord || "제스처"}
-          subtitle="비언어 표현"
-          description={
-            data.gestureFeedbackSentence || "비언어 표현 피드백이 없습니다."
-          }
+          status={data.gestureFeedbackWord}
+          subtitle="제스처 분석"
+          description={data.gestureFeedbackSentence}
         />
         <FluencyCard
-          status={fluency.status}
-          subtitle={fluency.subtitle}
-          description={data.fluencyFeedback || "발화 유창성 피드백이 없습니다."}
+          status={FLUENCY_STATUS[fluencyIdx]}
+          subtitle={FLUENCY_SUBTITLE[fluencyIdx]}
+          description={data.fluencyFeedback}
         />
         <GazeCard
           percentage={data.gazeDistribution.camera}
-          subtitle="정면 응시율"
-          description={getGazeDescription(
-            data.gazeDistribution,
-            data.gazeFeedback,
-          )}
+          subtitle="카메라 응시율"
+          description={data.gazeFeedback}
         />
         <SpeechCard
           score={`${data.speedScore}점`}
-          scoreSubtitle="적절성"
-          wpm={`${data.speedSpm}`}
+          scoreSubtitle="속도 점수"
+          wpm={data.speedSpm.toFixed(1)}
           wpmSubtitle="SPM"
-          description={getSpeedDistributionDescription(data.speedDistribution)}
+          description={speedDesc}
         />
       </section>
 
       <section className="mb-10 flex flex-col gap-6">
         <ScriptSimilarityCard
           percentage={data.finalScore}
-          subtitle={getFinalStatus(data.finalScore)}
-          description={review.overallReview}
+          subtitle={getScoreSubtitle(data.finalScore)}
+          description={getScriptDescription(data.finalScore)}
         />
         <AIEvaluationCard
-          overallReview={review.overallReview}
-          strengths={review.strengths}
-          improvements={review.improvements}
+          overallReview={overallReview}
+          strengths={strengths}
+          improvements={improvements}
         />
       </section>
 
-      <div data-print-hidden className="mb-12 flex justify-end gap-3">
-        <Button
-          variant="outline"
-          className="w-auto px-6"
-          onClick={saveReportPdf}
-        >
+      <div className="mb-12 flex justify-end gap-3">
+        <Button variant="outline" className="w-auto px-6">
           <div className="flex items-center gap-2">
             <FileDown className="h-5 w-5" />
             <span>PDF 저장하기</span>
           </div>
         </Button>
-        <Button
-          variant="primary"
-          className="w-auto px-6"
-          onClick={handleVideoSave}
-        >
+        <Button variant="primary" className="w-auto px-6">
           <div className="flex items-center gap-2">
             <PlayCircle className="h-5 w-5" />
             <span>영상 저장하기</span>
@@ -142,10 +132,7 @@ const PresentationReportPage = () => {
         </Button>
       </div>
 
-      <footer
-        data-print-hidden
-        className="flex justify-center gap-4 border-t border-border-default pt-10"
-      >
+      <footer className="flex justify-center gap-4 border-t border-border-default pt-10">
         <Button
           variant="outline"
           className="w-auto px-10"
@@ -167,13 +154,6 @@ const PresentationReportPage = () => {
           </div>
         </Button>
       </footer>
-      <Modal
-        isOpen={isVideoModalOpen}
-        title="영상 저장을 할 수 없습니다"
-        description={VIDEO_UNAVAILABLE_MESSAGE}
-        onClose={closeVideoModal}
-        onConfirm={closeVideoModal}
-      />
     </div>
   );
 };

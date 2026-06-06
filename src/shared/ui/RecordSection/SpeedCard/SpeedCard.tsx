@@ -4,6 +4,7 @@ export type SpeedStatus = "slow" | "normal" | "fast";
 
 interface SpeedCardProps {
   status: SpeedStatus;
+  spsScore?: number | null;
 }
 
 const SPEED_DATA = {
@@ -25,7 +26,7 @@ const SPEED_DATA = {
   },
 };
 
-export const SpeedCard = ({ status }: SpeedCardProps) => {
+export const SpeedCard = ({ status, spsScore }: SpeedCardProps) => {
   const data = SPEED_DATA[status];
   return (
     <div className="w-full rounded-2xl border border-border-default bg-background-light px-6 py-6 shadow-sm">
@@ -68,6 +69,16 @@ export const SpeedCard = ({ status }: SpeedCardProps) => {
       <p className="text-center text-body-01 text-text-primary">
         {data.description}
       </p>
+      {spsScore !== null && spsScore !== undefined && (
+        <div className="mt-4 flex items-center justify-center gap-1.5 rounded-xl bg-background-dark px-4 py-2">
+          <span className="text-caption-01 text-text-tertiary">
+            초당 음절 수
+          </span>
+          <span className="text-label-01 text-text-primary">
+            {spsScore.toFixed(2)} SPS
+          </span>
+        </div>
+      )}
     </div>
   );
 };

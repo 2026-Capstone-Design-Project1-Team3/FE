@@ -34,7 +34,7 @@ export const QuestionCard = ({
 
       <div className="mb-6 flex min-h-35 items-center justify-center rounded-xl border border-border-deactivated bg-background-dark px-8 py-6">
         <p className="text-center text-subtitle-02 text-text-primary">
-          &quot;{questions[currentIndex]}&quot;
+          {questions[currentIndex]}
         </p>
       </div>
 
