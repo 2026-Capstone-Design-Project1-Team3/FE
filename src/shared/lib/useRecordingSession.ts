@@ -59,6 +59,10 @@ export const useRecordingSession = ({
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const startTimeRef = useRef<number>(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stoppedRef = useRef(false);
+  const pendingStopRef = useRef(false);
+  const currentRecorderRef = useRef<MediaRecorder | null>(null);
 
   // WebSocket 연결
   useEffect(() => {
@@ -135,6 +139,7 @@ export const useRecordingSession = ({
         stream,
         mimeType ? { mimeType } : undefined,
       );
+      currentRecorderRef.current = recorder;
       const chunks: Blob[] = [];
 
       recorder.ondataavailable = ({ data }) => {
@@ -143,17 +148,23 @@ export const useRecordingSession = ({
 
       recorder.onstop = async () => {
         const activeWs = wsRef.current;
-        if (!activeWs || activeWs.readyState !== WebSocket.OPEN) return;
-        try {
-          const blob = new Blob(chunks, { type: recorder.mimeType });
-          const videoData = await blobToBase64(blob);
-          const currentTime = Date.now() - startTimeRef.current;
-          console.log("[청크] 전송 완료 - currentTime:", currentTime);
-          activeWs.send(
-            JSON.stringify({ type: "VIDEO_CHUNK", currentTime, videoData }),
-          );
-        } catch {
-          // 전송 실패 무시
+        if (activeWs && activeWs.readyState === WebSocket.OPEN) {
+          try {
+            const blob = new Blob(chunks, { type: recorder.mimeType });
+            const videoData = await blobToBase64(blob);
+            const currentTime = Date.now() - startTimeRef.current;
+            console.log("[청크] 전송 완료 - currentTime:", currentTime);
+            activeWs.send(
+              JSON.stringify({ type: "VIDEO_CHUNK", currentTime, videoData }),
+            );
+          } catch {
+            // 전송 실패 무시
+          }
+        }
+        currentRecorderRef.current = null;
+        // 종료 대기 중이었으면 전송 후 WS 닫기
+        if (pendingStopRef.current) {
+          wsRef.current?.close();
         }
       };
 
@@ -163,11 +174,39 @@ export const useRecordingSession = ({
       }, CHUNK_DURATION_MS);
     };
 
-    sendChunk();
-    const interval = setInterval(sendChunk, CHUNK_DURATION_MS);
+    if (stoppedRef.current) return;
 
-    return () => clearInterval(interval);
+    sendChunk();
+    intervalRef.current = setInterval(() => {
+      if (stoppedRef.current) {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        return;
+      }
+      sendChunk();
+    }, CHUNK_DURATION_MS);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [isConnected, videoEl]);
 
-  return { speedStatus, spsScore, isConnected };
+  const stop = () => {
+    stoppedRef.current = true;
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const recorder = currentRecorderRef.current;
+    if (recorder && recorder.state !== "inactive") {
+      // 현재 녹화 중인 청크가 있으면 즉시 stop → onstop에서 전송 후 WS 닫힘
+      pendingStopRef.current = true;
+      recorder.stop();
+    } else {
+      // 녹화 중인 청크 없으면 바로 WS 닫기
+      wsRef.current?.close();
+    }
+  };
+
+  return { speedStatus, spsScore, isConnected, stop };
 };

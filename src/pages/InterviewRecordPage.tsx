@@ -47,7 +47,11 @@ const InterviewRecordPage = () => {
   };
   const token = localStorage.getItem("accessToken") ?? "";
 
-  const { speedStatus, spsScore } = useRecordingSession({
+  const {
+    speedStatus,
+    spsScore,
+    stop: stopSession,
+  } = useRecordingSession({
     videoEl,
     folderId,
     token,
@@ -101,6 +105,7 @@ const InterviewRecordPage = () => {
 
   const handleEnd = async () => {
     setIsTimerRunning(false);
+    stopSession();
     try {
       const blob = await stopAndGetBlob();
       await startAlarm(blob);
