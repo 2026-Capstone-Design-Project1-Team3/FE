@@ -23,32 +23,36 @@ export interface CardNewsResponse {
   cardnews: CardNewsItem[];
 }
 
+export interface GazeDistribution {
+  screen: number;
+  camera: number;
+}
+
+export interface SpeedDistribution {
+  fast: number;
+  optimal: number;
+  slow: number;
+}
+
 export interface AnalysisDetailResponse {
   analysisId: string;
   folderId: string;
   title: string;
-  type: number;
+  type: number; // 0: 발표, 1: 면접
   summary: string;
   createdAt: string;
   gazeScore: number;
   gazeFeedback: string;
-  gazeDistribution: {
-    screen: number;
-    camera: number;
-  };
-  fluencyLevel: 0 | 1 | 2;
+  gazeDistribution: GazeDistribution;
+  fluencyLevel: number; // 0: 하, 1: 중, 2: 상
   fluencyFeedback: string;
   speedScore: number;
   speedSpm: number;
-  speedDistribution: {
-    fast: number;
-    optimal: number;
-    slow: number;
-  };
+  speedDistribution: SpeedDistribution;
   gestureFeedbackWord: string;
   gestureFeedbackSentence: string;
   finalScore: number;
-  finalFeedback: string;
+  finalFeedback: string; // <q>로 구분: 총평<q>강점1<q>강점2<q>개선1<q>개선2
   transcript: string;
   videoUrl?: string;
 }

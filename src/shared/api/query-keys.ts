@@ -20,13 +20,15 @@ export const queryKeys = {
   folder: {
     all: ["folder"] as const,
     list: (params?: FolderListParams) => ["folder", "list", params] as const,
+    detail: (folderId: string) => ["folder", "detail", folderId] as const,
     setting: (folderId: string) => ["folder", "setting", folderId] as const,
     statistics: (folderId: string) =>
       ["folder", "statistics", folderId] as const,
   },
   analysis: {
     all: ["analysis"] as const,
-    detail: (analysisId: string) => ["analysis", "detail", analysisId] as const,
+    detail: (analysisId: string | null) =>
+      ["analysis", "detail", analysisId] as const,
     statistics: (limit: number) => ["analysis", "statistics", limit] as const,
     cardNews: (params?: CardNewsParams) =>
       ["analysis", "cardNews", params] as const,

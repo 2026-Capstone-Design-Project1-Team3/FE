@@ -15,13 +15,17 @@ export interface FolderInfo {
 }
 
 export interface CreateFolderRequest {
-  title?: string;
-  fileName?: string;
-  fileKey?: string;
-  extraInfo?: string;
-  companyName?: string;
-  inputText?: string;
-  type?: number;
+  title: string;
+  fileName: string;
+  fileKey: string;
+  extraInfo: string;
+  companyName: string;
+  inputText: string;
+  type: number;
+}
+
+export interface CreateFolderResponse {
+  folderId: string;
 }
 
 export interface GenerateScriptRequest {
@@ -37,10 +41,25 @@ export interface DeleteFolderRequest {
   folderId?: string[];
 }
 
+export interface FolderDetailResponse {
+  title: string;
+  fileName: string;
+  extraInfo: string;
+  companyName: string;
+  inputText: string;
+}
+
 export type FolderListResponse = FolderInfo[];
 
+export interface EyeCalibration {
+  leftEyeOffset: number;
+  rightEyeOffset: number;
+  ratio: number;
+}
+
 export interface FolderSettingResponse {
-  [key: string]: unknown;
+  set: string;
+  eyeCalibration: EyeCalibration | null;
 }
 
 export interface FolderStatisticsResponse {

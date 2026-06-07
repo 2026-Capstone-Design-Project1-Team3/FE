@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import {
   ClipboardList,
   FileDown,
@@ -8,23 +6,8 @@ import {
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import {
-  formatReportDate,
-  getFluencyStatus,
-  getFinalStatus,
-  getGazeDescription,
-  getReportReview,
-  getReportStatus,
-  getSpeedDistributionDescription,
-  saveReportPdf,
-  saveReportVideo,
-  type ReportLocationState,
-  VIDEO_UNAVAILABLE_MESSAGE,
-} from "./reportDetailUtils";
-
 import { useAnalysisDetailQuery } from "@/features/analysis/model/useAnalysisDetailQuery";
 import { Button } from "@/shared/ui/Button/Button";
-import { Modal } from "@/shared/ui/Modal/Modal";
 import { AIEvaluationCard } from "@/shared/ui/ReportSection/AIEvaluationCard/AIEvaluationCard";
 import { AnswerCard } from "@/shared/ui/ReportSection/AnswerCard/AnswerCard";
 import { FluencyCard } from "@/shared/ui/ReportSection/FluencyCard/FluencyCard";
@@ -32,115 +15,124 @@ import { GazeCard } from "@/shared/ui/ReportSection/GazeCard/GazeCard";
 import { NonverbalCard } from "@/shared/ui/ReportSection/NonverbalCard/NonverbalCard";
 import { SpeechCard } from "@/shared/ui/ReportSection/SpeechCard/SpeechCard";
 
+const FLUENCY_SUBTITLE = ["개선 필요", "보통 단계", "우수 단계"];
+const FLUENCY_STATUS = ["Low", "Mid", "High"];
+
+const getScoreSubtitle = (score: number) => {
+  if (score >= 90) return "탁월함";
+  if (score >= 70) return "우수함";
+  if (score >= 50) return "보통";
+  return "개선 필요";
+};
+
+const getAnswerDescription = (score: number) => {
+  if (score >= 90) return "면접 질문에 매우 적절한 답변을 제공했습니다.";
+  if (score >= 70) return "질문의 의도를 잘 파악하여 논리적으로 답변했습니다.";
+  if (score >= 50) return "답변은 적절하나 구체적인 사례 보완이 권장됩니다.";
+  return "질문 의도 파악과 답변 구성에 더 많은 연습이 필요합니다.";
+};
+
+const parseFinalFeedback = (feedback: string | null | undefined) => {
+  if (!feedback) return { overallReview: "", strengths: [], improvements: [] };
+  const parts = feedback.split("<q>").map((s) => s.trim());
+  return {
+    overallReview: parts[0] ?? "",
+    strengths: [parts[1] ?? "", parts[2] ?? ""].filter(Boolean),
+    improvements: [parts[3] ?? "", parts[4] ?? ""].filter(Boolean),
+  };
+};
+
 const InterviewReportPage = () => {
   const navigate = useNavigate();
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const { analysisId, folderTitle } =
-    (useLocation().state as ReportLocationState | null) ?? {};
-  const { data, isError, isLoading } = useAnalysisDetailQuery(analysisId);
-  const status = getReportStatus(analysisId, isError, isLoading, Boolean(data));
-  const closeVideoModal = () => setIsVideoModalOpen(false);
+  const location = useLocation();
+  const { analysisId } = (location.state ?? {}) as { analysisId?: string };
 
-  const handleVideoSave = () =>
-    !saveReportVideo(data?.videoUrl, data?.title) && setIsVideoModalOpen(true);
+  const { data, isLoading } = useAnalysisDetailQuery(analysisId ?? null);
 
-  if (status || !data) {
+  if (isLoading || !data) {
     return (
-      <div
-        className={`mx-auto w-full max-w-5xl px-4 py-20 text-center ${
-          status?.error ? "text-error-01" : "text-text-deactivated"
-        }`}
-      >
-        {status?.message}
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="text-body-01 text-text-secondary animate-pulse">
+          리포트를 불러오는 중...
+        </span>
       </div>
     );
   }
 
-  const fluency = getFluencyStatus(data.fluencyLevel);
-  const review = getReportReview(data);
+  const fluencyIdx = Math.min(Math.max(data.fluencyLevel, 0), 2);
+  const { overallReview, strengths, improvements } = parseFinalFeedback(
+    data.finalFeedback,
+  );
+  const dist = data.speedDistribution ?? { fast: 0, optimal: 0, slow: 0 };
+  const speedDesc = `빠름 ${dist.fast}% / 적정 ${dist.optimal}% / 느림 ${dist.slow}%`;
 
   return (
-    <div
-      data-print-report
-      className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12"
-    >
+    <div className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12">
       <header className="mb-12 text-center">
         <h1 className="text-head-01 text-text-primary mb-4 tracking-tight">
           면접 분석 리포트
         </h1>
         <div className="text-label-03 text-text-tertiary flex justify-center gap-6">
-          <p>폴더명: {folderTitle ?? data.title}</p>
+          <p>폴더명: {data.title}</p>
           <div className="h-4 w-px bg-border-default" />
-          <p>일자: {formatReportDate(data.createdAt)}</p>
+          <p>일자: {data.createdAt.slice(0, 10).replace(/-/g, ".")}</p>
         </div>
       </header>
+
       <section className="mb-6 grid grid-cols-2 gap-6">
         <NonverbalCard
-          status={data.gestureFeedbackWord || "제스처"}
-          subtitle="비언어 표현"
-          description={
-            data.gestureFeedbackSentence || "비언어 표현 피드백이 없습니다."
-          }
+          status={data.gestureFeedbackWord}
+          subtitle="제스처 분석"
+          description={data.gestureFeedbackSentence}
         />
         <FluencyCard
-          status={fluency.status}
-          subtitle={fluency.subtitle}
-          description={data.fluencyFeedback || "발화 유창성 피드백이 없습니다."}
+          status={FLUENCY_STATUS[fluencyIdx]}
+          subtitle={FLUENCY_SUBTITLE[fluencyIdx]}
+          description={data.fluencyFeedback}
         />
         <GazeCard
-          percentage={data.gazeDistribution.camera}
-          subtitle="정면 응시율"
-          description={getGazeDescription(
-            data.gazeDistribution,
-            data.gazeFeedback,
-          )}
+          percentage={data.gazeDistribution?.camera ?? 0}
+          subtitle="카메라 응시율"
+          description={data.gazeFeedback}
         />
         <SpeechCard
           score={`${data.speedScore}점`}
-          scoreSubtitle="적절성"
-          wpm={`${data.speedSpm}`}
+          scoreSubtitle="속도 점수"
+          wpm={data.speedSpm.toFixed(1)}
           wpmSubtitle="SPM"
-          description={getSpeedDistributionDescription(data.speedDistribution)}
+          description={speedDesc}
         />
       </section>
+
       <section className="mb-10 flex flex-col gap-6">
         <AnswerCard
           percentage={data.finalScore}
-          subtitle={getFinalStatus(data.finalScore)}
-          description={review.overallReview}
+          subtitle={getScoreSubtitle(data.finalScore)}
+          description={getAnswerDescription(data.finalScore)}
         />
         <AIEvaluationCard
-          overallReview={review.overallReview}
-          strengths={review.strengths}
-          improvements={review.improvements}
+          overallReview={overallReview}
+          strengths={strengths}
+          improvements={improvements}
         />
       </section>
-      <div data-print-hidden className="mb-12 flex justify-end gap-3">
-        <Button
-          variant="outline"
-          className="w-auto px-6"
-          onClick={saveReportPdf}
-        >
+
+      <div className="mb-12 flex justify-end gap-3">
+        <Button variant="outline" className="w-auto px-6">
           <div className="flex items-center gap-2">
             <FileDown className="h-5 w-5" />
             <span>PDF 저장하기</span>
           </div>
         </Button>
-        <Button
-          variant="primary"
-          className="w-auto px-6"
-          onClick={handleVideoSave}
-        >
+        <Button variant="primary" className="w-auto px-6">
           <div className="flex items-center gap-2">
             <PlayCircle className="h-5 w-5" />
             <span>영상 저장하기</span>
           </div>
         </Button>
       </div>
-      <footer
-        data-print-hidden
-        className="flex justify-center gap-4 border-t border-border-default pt-10"
-      >
+
+      <footer className="flex justify-center gap-4 border-t border-border-default pt-10">
         <Button
           variant="outline"
           className="w-auto px-10"
@@ -162,14 +154,8 @@ const InterviewReportPage = () => {
           </div>
         </Button>
       </footer>
-      <Modal
-        isOpen={isVideoModalOpen}
-        title="영상 저장을 할 수 없습니다"
-        description={VIDEO_UNAVAILABLE_MESSAGE}
-        onClose={closeVideoModal}
-        onConfirm={closeVideoModal}
-      />
     </div>
   );
 };
+
 export default InterviewReportPage;

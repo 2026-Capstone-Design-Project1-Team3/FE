@@ -1,60 +1,79 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 
-import { FilePlus, FileCheck, X } from "lucide-react";
-
-type TitleType = "포트폴리오" | "자기소개서" | "발표 자료";
+import { FileCheck, FilePlus, X } from "lucide-react";
 
 type BaseProps = {
-  title: TitleType;
+  title: string;
 };
 
 type InteractiveProps = BaseProps & {
   variant?: "interactive";
+  file?: File | null;
+  onFileChange?: (file: File | null) => void;
+  onFileRemove?: () => void;
 };
 
 type ReadonlyProps = BaseProps & {
   variant: "readonly";
   fileName: string;
-  fileSize: number; // byte 단위
+  fileSize: number;
 };
 
 type FileUploadProps = InteractiveProps | ReadonlyProps;
 
 export const FileUploadCard = (props: FileUploadProps) => {
   const { title, variant = "interactive" } = props;
-  const [file, setFile] = useState<File | null>(null);
+  const [internalFile, setInternalFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isReadonly = variant === "readonly";
+  const interactiveProps = !isReadonly ? (props as InteractiveProps) : null;
+  const readonlyProps = isReadonly ? (props as ReadonlyProps) : null;
+  const controlledFile = interactiveProps?.file;
+  const file = controlledFile !== undefined ? controlledFile : internalFile;
   const hasFile = isReadonly || file !== null;
 
-  const displayFileName = isReadonly
-    ? (props as ReadonlyProps).fileName
-    : file?.name;
-  const displayFileSize = isReadonly
-    ? (props as ReadonlyProps).fileSize
-    : file?.size;
+  const displayFileName = isReadonly ? readonlyProps?.fileName : file?.name;
+  const displayFileSize = isReadonly ? readonlyProps?.fileSize : file?.size;
+
+  const DEFAULT_FILE_SIZE_MB = 5.3;
 
   const formatBytesToMB = (bytes?: number) => {
-    if (!bytes || bytes === 0) return "0 MB";
+    if (!bytes || bytes === 0)
+      return isReadonly ? `${DEFAULT_FILE_SIZE_MB} MB` : "0 MB";
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(1)} MB`;
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFile = e.target.files[0];
-      if (selectedFile.type === "application/pdf") {
-        setFile(selectedFile);
-      } else {
-        alert("PDF 파일만 업로드 가능합니다.");
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }
+  const updateFile = (nextFile: File | null) => {
+    if (interactiveProps?.onFileChange) {
+      interactiveProps.onFileChange(nextFile);
+      return;
     }
+
+    setInternalFile(nextFile);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+
+    if (selectedFile.type === "application/pdf") {
+      updateFile(selectedFile);
+      return;
+    }
+
+    alert("PDF 파일만 업로드 가능합니다.");
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleRemove = () => {
-    setFile(null);
+    if (interactiveProps?.onFileRemove) {
+      interactiveProps.onFileRemove();
+    } else {
+      updateFile(null);
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -85,6 +104,7 @@ export const FileUploadCard = (props: FileUploadProps) => {
         <div className="w-full relative flex flex-col items-center justify-center py-10 px-4 border border-border-default rounded-xl bg-background-light">
           {!isReadonly && (
             <button
+              type="button"
               onClick={handleRemove}
               className="absolute top-4 right-4 p-1 text-text-deactivated hover:text-text-tertiary transition-colors"
               aria-label="파일 삭제"

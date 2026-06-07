@@ -71,7 +71,7 @@ const ExistingPracticeContent = ({
         이전에 설정했던 환경에서 이어서 연습합니다.
       </p>
 
-      {isSelected && folderName && (
+      {folderName && (
         <div className="mb-4 text-subtitle-04 text-gray-700">{folderName}</div>
       )}
 
@@ -102,7 +102,7 @@ export const SelectPracticeCard = (props: SelectPracticeCardProps) => {
   return (
     <div
       className={`${baseCardClass} ${selectedClass}`.trim()}
-      onClick={onClick}
+      onClick={variant === "new" ? onClick : undefined}
     >
       {variant === "new" ? (
         <NewPracticeContent

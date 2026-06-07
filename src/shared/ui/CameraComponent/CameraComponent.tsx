@@ -11,6 +11,7 @@ import { cn } from "@/utils/cn";
 interface CameraComponentProps {
   onError?: (errorMessage: string | null) => void;
   className?: string;
+  audio?: boolean;
 }
 
 export interface CameraHandle {
@@ -19,7 +20,7 @@ export interface CameraHandle {
 
 const CameraComponent = forwardRef<CameraHandle, CameraComponentProps>(
   (props, ref) => {
-    const { onError, className } = props;
+    const { onError, className, audio = false } = props;
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -33,7 +34,7 @@ const CameraComponent = forwardRef<CameraHandle, CameraComponentProps>(
         try {
           const stream = await navigator.mediaDevices.getUserMedia({
             video: { width: 1280, height: 720 },
-            audio: false,
+            audio,
           });
           streamRef.current = stream;
           if (videoRef.current) {
@@ -48,6 +49,8 @@ const CameraComponent = forwardRef<CameraHandle, CameraComponentProps>(
       };
 
       startCamera();
+
+      // audio는 마운트 시점에만 적용되므로 의도적으로 의존성에서 제외
 
       return () => {
         if (streamRef.current) {
