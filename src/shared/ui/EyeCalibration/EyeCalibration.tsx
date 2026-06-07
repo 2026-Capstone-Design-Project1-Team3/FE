@@ -10,7 +10,7 @@ export interface EyeCalibrationProps {
 }
 
 export const EyeCalibration: FC<EyeCalibrationProps> = (props) => {
-  const { complete = false, completeAt, className } = props;
+  const { complete = false, className } = props;
   const StatusIcon = complete ? CircleCheck : CircleAlert;
   const navigation = useNavigate();
   const handleGoToCalibration = () => {
@@ -32,14 +32,6 @@ export const EyeCalibration: FC<EyeCalibrationProps> = (props) => {
               ? "정상적으로 캘리브레이션 되었습니다."
               : "아직 카메라 캘리브레이션이 완료되지 않았습니다.\n 정확한 AI 분석을 위해 연습 전 캘리브레이션을 진행해주세요."}
           </p>
-          {complete && (
-            <span className="text-subtitle-04 text-secondary-900 flex">
-              LAST SYNC
-              <span className="px-3 text-gray-500">
-                {completeAt || "----/--/--"}
-              </span>
-            </span>
-          )}
         </div>
       </div>
       <p className="text-body-01 pb-10 text-gray-600">

@@ -2,12 +2,17 @@ import { useState } from "react";
 
 import { Sparkles, Upload } from "lucide-react";
 
-type ScriptMethodType = "auto" | "manual";
+export type ScriptMethodType = "auto" | "manual";
 
 interface ScriptOptionCardProps {
   method: ScriptMethodType;
   isSelected: boolean;
   onClick: () => void;
+}
+
+interface SelectScriptCardProps {
+  selectedMethod?: ScriptMethodType | null;
+  onMethodChange?: (method: ScriptMethodType) => void;
 }
 
 const ScriptOptionCard = ({
@@ -16,25 +21,22 @@ const ScriptOptionCard = ({
   onClick,
 }: ScriptOptionCardProps) => {
   const isAuto = method === "auto";
-
-  const title = isAuto ? "PPT 기반 대본 자동 생성 (추천)" : "대본 직접 업로드";
+  const title = isAuto ? "PPT 기반 대본 자동 생성" : "대본 직접 입력";
   const description = isAuto
-    ? "AI가 업로드한 PPT 내용을 분석하여 최적의 발표 대본을 자동으로 구성합니다."
-    : "준비된 대본 파일이 있는 경우 텍스트를 직접 붙여넣어 사용합니다.";
+    ? "업로드한 발표 자료를 바탕으로 AI가 발표 대본을 생성합니다."
+    : "이미 준비된 발표 대본을 직접 입력해서 사용합니다.";
 
   const Icon = isAuto ? Sparkles : Upload;
   const cardBorderClass = isSelected
     ? "border-primary-900"
     : "border-border-default hover:border-border-strong";
-
   const cardBgClass = isSelected ? "bg-primary-50" : "bg-background-light";
-
   const iconBgClass = isSelected ? "bg-primary-800" : "bg-gray-100";
-
   const iconColorClass = isSelected ? "text-white" : "text-text-tertiary";
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
       className={`flex flex-col flex-1 p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 text-left ${cardBorderClass} ${cardBgClass}`}
     >
@@ -49,14 +51,28 @@ const ScriptOptionCard = ({
       <p className="text-body-02 text-text-secondary break-keep">
         {description}
       </p>
-    </div>
+    </button>
   );
 };
 
-export const SelectScriptCard = () => {
-  const [selectedMethod, setSelectedMethod] = useState<ScriptMethodType | null>(
+export const SelectScriptCard = ({
+  selectedMethod,
+  onMethodChange,
+}: SelectScriptCardProps = {}) => {
+  const [internalMethod, setInternalMethod] = useState<ScriptMethodType | null>(
     null,
   );
+  const currentMethod =
+    selectedMethod !== undefined ? selectedMethod : internalMethod;
+
+  const handleSelect = (method: ScriptMethodType) => {
+    if (onMethodChange) {
+      onMethodChange(method);
+      return;
+    }
+
+    setInternalMethod(method);
+  };
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -65,13 +81,13 @@ export const SelectScriptCard = () => {
       <div className="flex w-full gap-4">
         <ScriptOptionCard
           method="auto"
-          isSelected={selectedMethod === "auto"}
-          onClick={() => setSelectedMethod("auto")}
+          isSelected={currentMethod === "auto"}
+          onClick={() => handleSelect("auto")}
         />
         <ScriptOptionCard
           method="manual"
-          isSelected={selectedMethod === "manual"}
-          onClick={() => setSelectedMethod("manual")}
+          isSelected={currentMethod === "manual"}
+          onClick={() => handleSelect("manual")}
         />
       </div>
     </div>

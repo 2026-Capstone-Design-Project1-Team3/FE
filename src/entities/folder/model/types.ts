@@ -6,14 +6,26 @@ export type FolderListQuery = {
   keyWord?: string;
 };
 
+export interface FolderInfo {
+  folderId: string;
+  title: string;
+  type: number;
+  updatedAt: string;
+  totalAnalyses: number;
+}
+
 export interface CreateFolderRequest {
-  title?: string;
-  fileName?: string;
-  fileKey?: string;
-  extraInfo?: string;
-  companyName?: string;
-  inputText?: string;
-  type?: number;
+  title: string;
+  fileName: string;
+  fileKey: string;
+  extraInfo: string;
+  companyName: string;
+  inputText: string;
+  type: number;
+}
+
+export interface CreateFolderResponse {
+  folderId: string;
 }
 
 export interface GenerateScriptRequest {
@@ -29,14 +41,29 @@ export interface DeleteFolderRequest {
   folderId?: string[];
 }
 
-export interface FolderListResponse {
-  [key: string]: unknown;
+export interface FolderDetailResponse {
+  title: string;
+  fileName: string;
+  extraInfo: string;
+  companyName: string;
+  inputText: string;
+}
+
+export type FolderListResponse = FolderInfo[];
+
+export interface EyeCalibration {
+  leftEyeOffset: number;
+  rightEyeOffset: number;
+  ratio: number;
 }
 
 export interface FolderSettingResponse {
-  [key: string]: unknown;
+  set: string;
+  eyeCalibration: EyeCalibration | null;
 }
 
 export interface FolderStatisticsResponse {
-  [key: string]: unknown;
+  gazeScore: number;
+  speedScore: number;
+  finalScore: number;
 }

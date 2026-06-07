@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
     base: "/folder", // GET (목록 조회), POST (생성)
     delete: "/folder/delete",
     outputText: "/folder/outputText",
+    detail: (folderId: string) => `/folder/${folderId}`,
     setting: (folderId: string) => `/folder/setting/${folderId}`,
     statistics: (folderId: string) => `/folder/statistics/${folderId}`,
   },
@@ -21,8 +22,10 @@ export const API_ENDPOINTS = {
     cardNews: "/analysis/cardNews",
     detail: (analysisId: string) => `/analysis/${analysisId}`,
     statistics: (limit: number) => `/analysis/statistics/${limit}`,
+    alarm: "/analysis/alarm",
   },
   file: {
-    presignedUrl: (fileName: string) => `/files/presignedUrl/${fileName}`,
+    presignedUrl: (fileName: string) =>
+      `/files/presignedUrl/${encodeURIComponent(fileName)}`,
   },
 } as const;

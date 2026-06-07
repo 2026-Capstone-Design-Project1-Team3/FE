@@ -14,6 +14,8 @@ export interface EditorModalProps {
   onSave: (updatedScript: string) => void;
 }
 
+const MAX_LENGTH = 4000;
+
 export const EditorModal = ({
   isOpen,
   originalScript,
@@ -85,6 +87,11 @@ export const EditorModal = ({
                 {originalScript}
               </div>
             </div>
+            <div className="flex justify-end mt-1 px-1">
+              <span className="text-caption-01 text-text-tertiary">
+                {originalScript.length} / {MAX_LENGTH}자
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-1 flex-col">
@@ -101,10 +108,16 @@ export const EditorModal = ({
             <div className="flex w-full h-130 flex-col overflow-hidden rounded-2xl border-2 border-primary-500 focus-within:border-primary-700 bg-background-light shadow-sm transition-colors">
               <textarea
                 className="h-full w-full resize-none bg-transparent p-8 text-body-01 text-text-primary leading-relaxed outline-none scrollbar-thin"
+                maxLength={MAX_LENGTH}
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
                 placeholder="첨삭 내용을 수정해주세요."
               />
+            </div>
+            <div className="flex justify-end mt-1 px-1">
+              <span className="text-caption-01 text-text-tertiary">
+                {editedText.length} / {MAX_LENGTH}자
+              </span>
             </div>
           </div>
         </div>

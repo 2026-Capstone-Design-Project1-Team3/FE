@@ -1,7 +1,23 @@
-import { interviewRecords } from "@/mocks/reportPageData";
+import { useState } from "react";
+
+import { toFolderRecords } from "./resultFolderRecords";
+
+import { useFolderListQuery } from "@/features/folder/model/useFolderListQuery";
 import { FolderTable } from "@/shared/ui/FolderTable/FolderTable";
 
+const ITEMS_PER_PAGE = 5;
+
 export const InterviewReportPage = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, isError, isLoading } = useFolderListQuery({
+    type: 1,
+    how: 0,
+    limit: ITEMS_PER_PAGE,
+    page: currentPage - 1,
+  });
+  const records = toFolderRecords(data, "interview");
+  const totalPages = currentPage + (records.length === ITEMS_PER_PAGE ? 1 : 0);
+
   return (
     <main>
       <div className="min-h-full w-full">
@@ -14,7 +30,23 @@ export const InterviewReportPage = () => {
             <h1 className="text-head-01 text-text-primary">면접 연습 기록</h1>
           </section>
 
-          <FolderTable records={interviewRecords} itemsPerPage={5} />
+          {isError ? (
+            <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-error-01">
+              기록을 불러오는데 실패했습니다.
+            </div>
+          ) : isLoading ? (
+            <div className="rounded-2xl border border-border-default bg-background-light p-10 text-center text-text-deactivated">
+              기록을 불러오는 중입니다...
+            </div>
+          ) : (
+            <FolderTable
+              records={records}
+              itemsPerPage={ITEMS_PER_PAGE}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </div>
       </div>
     </main>

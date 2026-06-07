@@ -4,8 +4,9 @@ import {
   LayoutDashboard,
   PlayCircle,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import { useAnalysisDetailQuery } from "@/features/analysis/model/useAnalysisDetailQuery";
 import { Button } from "@/shared/ui/Button/Button";
 import { AIEvaluationCard } from "@/shared/ui/ReportSection/AIEvaluationCard/AIEvaluationCard";
 import { FluencyCard } from "@/shared/ui/ReportSection/FluencyCard/FluencyCard";
@@ -14,59 +15,58 @@ import { NonverbalCard } from "@/shared/ui/ReportSection/NonverbalCard/Nonverbal
 import { ScriptSimilarityCard } from "@/shared/ui/ReportSection/ScriptSimilarityCard/ScriptSimilarityCard";
 import { SpeechCard } from "@/shared/ui/ReportSection/SpeechCard/SpeechCard";
 
+const FLUENCY_SUBTITLE = ["개선 필요", "보통 단계", "우수 단계"];
+const FLUENCY_STATUS = ["Low", "Mid", "High"];
+
+const getScoreSubtitle = (score: number) => {
+  if (score >= 90) return "매우 높음";
+  if (score >= 70) return "높음";
+  if (score >= 50) return "보통";
+  return "낮음";
+};
+
+const getScriptDescription = (score: number) => {
+  if (score >= 90)
+    return "대본 숙련도가 매우 높으며, 자연스럽게 전달하는 수준입니다.";
+  if (score >= 70) return "대본을 잘 숙지하고 있으며, 전달이 자연스럽습니다.";
+  if (score >= 50)
+    return "대본의 핵심 내용은 전달되었으나, 더 많은 연습이 권장됩니다.";
+  return "대본 숙달이 더 필요합니다. 핵심 키워드 중심으로 연습하세요.";
+};
+
+const parseFinalFeedback = (feedback: string | null | undefined) => {
+  if (!feedback) return { overallReview: "", strengths: [], improvements: [] };
+  const parts = feedback.split("<q>").map((s) => s.trim());
+  return {
+    overallReview: parts[0] ?? "",
+    strengths: [parts[1] ?? "", parts[2] ?? ""].filter(Boolean),
+    improvements: [parts[3] ?? "", parts[4] ?? ""].filter(Boolean),
+  };
+};
+
 const PresentationReportPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { analysisId } = (location.state ?? {}) as { analysisId?: string };
 
-  const MOCK_DATA = {
-    header: {
-      folder: "2024 상반기 학급 학술 홍보",
-      date: "2024. 10. 24",
-    },
-    nonverbal: {
-      status: "안정적",
-      subtitle: "자세 유지",
-      description:
-        "어깨와 팔의 대칭이 안정적입니다. 강조 시 손 동작을 추가하면 더욱 효과적입니다.",
-    },
-    fluency: {
-      status: "High",
-      subtitle: "우수 단계",
-      description:
-        "불필요한 추임새 없이 문장 연결이 매우 매끄럽고 호흡이 안정적입니다.",
-    },
-    gaze: {
-      percentage: 88,
-      subtitle: "정면 응시율",
-      description:
-        "높은 응시율로 청중에게 신뢰감을 전달했으며 시선 배분이 일정합니다.",
-    },
-    speech: {
-      score: "92점",
-      scoreSubtitle: "적정성",
-      wpm: "135",
-      wpmSubtitle: "WPM",
-      description:
-        "전반적인 속도는 이상적이나, 결론 부분에서 속도가 빨라지는 점을 주의하세요.",
-    },
-    script: {
-      percentage: 90,
-      subtitle: "매우 높음",
-      description:
-        "대본 숙련도가 매우 높으며, 본인의 언어로 자연스럽게 전달하는 수준입니다. 암기보다는 이해도가 돋보입니다.",
-    },
-    aiEvaluation: {
-      overallReview:
-        "전체적인 전달력은 우수하지만, 결론부의 강조를 위한 완급 조절이 보완되면 완벽한 발표가 될 것입니다.",
-      strengths: [
-        "안정적인 시선 처리 및 청중 교감",
-        "자연스러운 제스처와 신체 언어",
-      ],
-      improvements: [
-        "적절한 포즈(Pause) 활용 필요",
-        "핵심 키워드 발음 시 강세 조절",
-      ],
-    },
-  };
+  const { data, isLoading } = useAnalysisDetailQuery(analysisId ?? null);
+
+  if (isLoading || !data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="text-body-01 text-text-secondary animate-pulse">
+          리포트를 불러오는 중...
+        </span>
+      </div>
+    );
+  }
+
+  const fluencyIdx = Math.min(Math.max(data.fluencyLevel, 0), 2);
+  const { overallReview, strengths, improvements } = parseFinalFeedback(
+    data.finalFeedback,
+  );
+  const dist = data.speedDistribution ?? { fast: 0, optimal: 0, slow: 0 };
+  const speedDesc = `빠름 ${dist.fast}% / 적정 ${dist.optimal}% / 느림 ${dist.slow}%`;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12">
@@ -75,47 +75,47 @@ const PresentationReportPage = () => {
           발표 분석 리포트
         </h1>
         <div className="flex justify-center gap-6 text-label-03 text-text-tertiary">
-          <p>폴더명: {MOCK_DATA.header.folder}</p>
+          <p>폴더명: {data.title}</p>
           <div className="h-4 w-px bg-border-default" />
-          <p>일자: {MOCK_DATA.header.date}</p>
+          <p>일자: {data.createdAt.slice(0, 10).replace(/-/g, ".")}</p>
         </div>
       </header>
 
       <section className="mb-6 grid grid-cols-2 gap-6">
         <NonverbalCard
-          status={MOCK_DATA.nonverbal.status}
-          subtitle={MOCK_DATA.nonverbal.subtitle}
-          description={MOCK_DATA.nonverbal.description}
+          status={data.gestureFeedbackWord}
+          subtitle="제스처 분석"
+          description={data.gestureFeedbackSentence}
         />
         <FluencyCard
-          status={MOCK_DATA.fluency.status}
-          subtitle={MOCK_DATA.fluency.subtitle}
-          description={MOCK_DATA.fluency.description}
+          status={FLUENCY_STATUS[fluencyIdx]}
+          subtitle={FLUENCY_SUBTITLE[fluencyIdx]}
+          description={data.fluencyFeedback}
         />
         <GazeCard
-          percentage={MOCK_DATA.gaze.percentage}
-          subtitle={MOCK_DATA.gaze.subtitle}
-          description={MOCK_DATA.gaze.description}
+          percentage={data.gazeDistribution?.camera ?? 0}
+          subtitle="카메라 응시율"
+          description={data.gazeFeedback}
         />
         <SpeechCard
-          score={MOCK_DATA.speech.score}
-          scoreSubtitle={MOCK_DATA.speech.scoreSubtitle}
-          wpm={MOCK_DATA.speech.wpm}
-          wpmSubtitle={MOCK_DATA.speech.wpmSubtitle}
-          description={MOCK_DATA.speech.description}
+          score={`${data.speedScore}점`}
+          scoreSubtitle="속도 점수"
+          wpm={data.speedSpm.toFixed(1)}
+          wpmSubtitle="SPM"
+          description={speedDesc}
         />
       </section>
 
       <section className="mb-10 flex flex-col gap-6">
         <ScriptSimilarityCard
-          percentage={MOCK_DATA.script.percentage}
-          subtitle={MOCK_DATA.script.subtitle}
-          description={MOCK_DATA.script.description}
+          percentage={data.finalScore}
+          subtitle={getScoreSubtitle(data.finalScore)}
+          description={getScriptDescription(data.finalScore)}
         />
         <AIEvaluationCard
-          overallReview={MOCK_DATA.aiEvaluation.overallReview}
-          strengths={MOCK_DATA.aiEvaluation.strengths}
-          improvements={MOCK_DATA.aiEvaluation.improvements}
+          overallReview={overallReview}
+          strengths={strengths}
+          improvements={improvements}
         />
       </section>
 

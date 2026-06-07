@@ -2,7 +2,6 @@ import { Info } from "lucide-react";
 
 type BaseInfoProps = {
   folderName: string;
-  date: string;
 };
 
 type InterviewProps = BaseInfoProps & {
@@ -13,13 +12,23 @@ type InterviewProps = BaseInfoProps & {
 
 type PresentationProps = BaseInfoProps & {
   variant: "presentation";
-  targetTime: string;
 };
 
 export type InfoCardProps = InterviewProps | PresentationProps;
 
+const formatToday = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const date = String(today.getDate()).padStart(2, "0");
+
+  return `${year}.${month}.${date}`;
+};
+
 export const InfoCard = (props: InfoCardProps) => {
-  const { variant, folderName, date } = props;
+  const { variant, folderName } = props;
+  const today = formatToday();
+
   return (
     <div className="w-full rounded-2xl border border-border-default hover:bg-background-dark bg-background-light px-6 py-6 shadow-sm">
       <div className="mb-6 flex items-center gap-2.5">
@@ -28,8 +37,9 @@ export const InfoCard = (props: InfoCardProps) => {
           {variant === "interview" ? "면접 정보" : "발표 정보"}
         </h2>
       </div>
+
       <div
-        className={`grid w-full gap-6 ${variant === "interview" ? "grid-cols-4" : "grid-cols-3"}`}
+        className={`grid w-full gap-6 ${variant === "interview" ? "grid-cols-4" : "grid-cols-2"}`}
       >
         <div className="flex flex-col gap-2">
           <span className="text-label-01 text-text-secondary">
@@ -37,11 +47,13 @@ export const InfoCard = (props: InfoCardProps) => {
           </span>
           <span className="text-body-01 text-text-primary">{folderName}</span>
         </div>
+
         <div className="flex flex-col gap-2">
           <span className="text-label-01 text-text-secondary">날짜</span>
-          <span className="text-body-01 text-text-primary">{date}</span>
+          <span className="text-body-01 text-text-primary">{today}</span>
         </div>
-        {variant === "interview" ? (
+
+        {variant === "interview" && (
           <>
             <div className="flex flex-col gap-2">
               <span className="text-label-01 text-text-secondary">기업명</span>
@@ -49,6 +61,7 @@ export const InfoCard = (props: InfoCardProps) => {
                 {props.companyName}
               </span>
             </div>
+
             <div className="flex flex-col gap-2">
               <span className="text-label-01 text-text-secondary">직무</span>
               <span className="text-body-01 text-text-primary">
@@ -56,13 +69,6 @@ export const InfoCard = (props: InfoCardProps) => {
               </span>
             </div>
           </>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <span className="text-label-01 text-text-secondary">목표 시간</span>
-            <span className="text-body-01 text-text-primary">
-              {props.targetTime}
-            </span>
-          </div>
         )}
       </div>
     </div>
