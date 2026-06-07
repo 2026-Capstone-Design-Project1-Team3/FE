@@ -34,7 +34,8 @@ const getScriptDescription = (score: number) => {
   return "대본 숙달이 더 필요합니다. 핵심 키워드 중심으로 연습하세요.";
 };
 
-const parseFinalFeedback = (feedback: string) => {
+const parseFinalFeedback = (feedback: string | null | undefined) => {
+  if (!feedback) return { overallReview: "", strengths: [], improvements: [] };
   const parts = feedback.split("<q>").map((s) => s.trim());
   return {
     overallReview: parts[0] ?? "",
@@ -64,7 +65,8 @@ const PresentationReportPage = () => {
   const { overallReview, strengths, improvements } = parseFinalFeedback(
     data.finalFeedback,
   );
-  const speedDesc = `빠름 ${data.speedDistribution.fast}% / 적정 ${data.speedDistribution.optimal}% / 느림 ${data.speedDistribution.slow}%`;
+  const dist = data.speedDistribution ?? { fast: 0, optimal: 0, slow: 0 };
+  const speedDesc = `빠름 ${dist.fast}% / 적정 ${dist.optimal}% / 느림 ${dist.slow}%`;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col px-4 py-12">
@@ -91,7 +93,7 @@ const PresentationReportPage = () => {
           description={data.fluencyFeedback}
         />
         <GazeCard
-          percentage={data.gazeDistribution.camera}
+          percentage={data.gazeDistribution?.camera ?? 0}
           subtitle="카메라 응시율"
           description={data.gazeFeedback}
         />
