@@ -1,4 +1,4 @@
-# 2026 경북대학교 종합설계프로젝트1 001분반 - AI 기반 모의 면접/발표 도우미 웹 서비스
+# 2026 경북대학교 종합설계프로젝트1 001분반 3팀<br/>: AI 기반 모의 면접/발표 도우미 웹 서비스
 
 <p align="center">
   <img width="4186" height="2586" alt="Device - Macbook Pro-3" src="https://github.com/user-attachments/assets/3d0f2ee6-e033-4884-9a44-902023a16b22" />
@@ -223,10 +223,9 @@
 ---
 
 ## 👥 팀원 소개
-
-|                                                               |                                                       |                                                                                 |                                                                                    |
-| :-----------------------------------------------------------: | :---------------------------------------------------: | :-----------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
-|                          <!-- 이미지 -->                         |                      <!-- 이미지 -->                     |                                   <!-- 이미지 -->                                  |                                    <!-- 이미지 -->                                    |
-|                              한나영                              |                          유지오                          |                                       노현경                                       |                                         진유민                                        |
-|                            Frontend                           |                        Frontend                       |                                     Backend                                     |                                         AI                                         |
-| AI WebSocket 실시간 연동<br/>UI/UX 설계<br/>백엔드 API 연동<br/>Vercel 배포 | 마이페이지 구현<br/>백엔드 API 연동<br/>발표/면접 기록 구현<br/>결과 시각화 구현 | Spring Boot 서버 구축<br/>REST API 설계 및 구현<br/>AWS EC2/S3/RDS 인프라<br/>하이브리드 통신 아키텍처 | Faster-Whisper / librosa 기반 음성 분석 모델 구현<br/>MediaPipe 기반 시선/제스처 분석 모델 구현<br/>sentence-transformers 대본 유사도 분석 모델 구현<br/>AI 서버(FastAPI + WebSocket) 구축<br/>EC2 배포 및 메모리 최적화 |
+| **FRONTEND** | **FRONTEND** | **BACKEND** | **AI** |
+| :---: | :---: | :---: | :---: |
+| <img src="https://avatars.githubusercontent.com/u/210795642?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/83810621?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/176283083?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/88077984?v=4" width="200"> |
+| [한나영](https://github.com/nyoeng) | [유지오](https://github.com/yu-jio) | [노현경](https://github.com/getOffWork102) | [진유민](https://github.com/min212) |
+| 플랫폼SW & 데이터과학전공 24학번 | 플랫폼SW & 데이터과학전공 21학번 | 글로벌SW전공 23학번 | 인공지능컴퓨팅전공 24학번 |
+| AI WebSocket 실시간 연동<br/>UI/UX 설계<br/>백엔드 API 연동<br/>Vercel 배포 | 마이페이지 구현<br/>백엔드 API 연동<br/>발표/면접 기록 구현<br/>결과 시각화 구현 | Spring Boot 서버 구축<br/>REST API 설계 및 구현<br/>AWS EC2/S3/RDS 인프라<br/>하이브리드 통신 아키텍처 |  Faster-Whisper / librosa 기반 음성 분석 모델 구현<br/>MediaPipe 기반 시선/제스처 분석 모델 구현<br/>sentence-transformers 대본 유사도 분석 모델 구현<br/>AI 서버(FastAPI + WebSocket) 구축<br/>EC2 배포 및 메모리 최적화 |
