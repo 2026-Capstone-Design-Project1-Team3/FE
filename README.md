@@ -175,6 +175,9 @@
       <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white">
       <img src="https://img.shields.io/badge/Faster--Whisper-000000?style=flat&logo=openai&logoColor=white">
       <img src="https://img.shields.io/badge/MediaPipe-0097A7?style=flat&logo=google&logoColor=white">
+      <img src="https://img.shields.io/badge/librosa-FF6F00?style=flat&logoColor=white">
+      <img src="https://img.shields.io/badge/sentence--transformers-4285F4?style=flat&logo=huggingface&logoColor=white">
+      <img src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat&logo=opencv&logoColor=white">
     </td>
   </tr>
 
@@ -214,6 +217,7 @@
 
 * Faster-Whisper를 활용해 사용자의 발화 속도 분석
 * MediaPipe를 활용해 시선과 제스처 분석
+* librosa의 피치/에너지/Jitter 지표를 활용해 음성 떨림 및 유창성을 분석
 * 텍스트 답변 평가에만 머무르지 않고, 실제 발표/면접 상황에서 중요한 말하기 습관과 비언어적 표현을 함께 피드백
 
 ---
@@ -225,4 +229,4 @@
 |                          <!-- 이미지 -->                         |                      <!-- 이미지 -->                     |                                   <!-- 이미지 -->                                  |                                    <!-- 이미지 -->                                    |
 |                              한나영                              |                          유지오                          |                                       노현경                                       |                                         진유민                                        |
 |                            Frontend                           |                        Frontend                       |                                     Backend                                     |                                         AI                                         |
-| AI WebSocket 실시간 연동<br/>UI/UX 설계<br/>백엔드 API 연동<br/>Vercel 배포 | 마이페이지 구현<br/>백엔드 API 연동<br/>발표/면접 기록 구현<br/>결과 시각화 구현 | Spring Boot 서버 구축<br/>REST API 설계 및 구현<br/>AWS EC2/S3/RDS 인프라<br/>하이브리드 통신 아키텍처 | Faster-Whisper 속도 분석<br/>MediaPipe 시선/제스처 분석<br/>FastAPI AI 서버 구축<br/>EC2 배포 및 최적화 |
+| AI WebSocket 실시간 연동<br/>UI/UX 설계<br/>백엔드 API 연동<br/>Vercel 배포 | 마이페이지 구현<br/>백엔드 API 연동<br/>발표/면접 기록 구현<br/>결과 시각화 구현 | Spring Boot 서버 구축<br/>REST API 설계 및 구현<br/>AWS EC2/S3/RDS 인프라<br/>하이브리드 통신 아키텍처 | Faster-Whisper / librosa 기반 음성 분석 모델 구현<br/>MediaPipe 기반 시선/제스처 분석 모델 구현<br/>sentence-transformers 대본 유사도 분석 모델 구현<br/>AI 서버(FastAPI + WebSocket) 구축<br/>EC2 배포 및 메모리 최적화 |
