@@ -154,8 +154,10 @@
     <td>
       <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=white">
       <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white">
-      <img src="https://img.shields.io/badge/WebSocket-010101?style=flat&logo=socketdotio&logoColor=white">
       <img src="https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white">
+      <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white">
+      <img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=flat&logo=reactquery&logoColor=white">
+      <img src="https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white">
     </td>
   </tr>
 
@@ -164,7 +166,10 @@
     <td>
       <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white">
       <img src="https://img.shields.io/badge/REST_API-000000?style=flat&logo=fastapi&logoColor=white">
-      <img src="https://img.shields.io/badge/WebSocket-010101?style=flat&logo=socketdotio&logoColor=white">
+      <img src="https://img.shields.io/badge/SSE-FF6C37?style=flat&logo=server&logoColor=white">
+      <img src="https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white">
+      <img src="https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white">
+      <img src="https://img.shields.io/badge/AWS_SDK-232F3E?style=flat&logo=amazonaws&logoColor=white">
     </td>
   </tr>
 
@@ -228,4 +233,4 @@
 | <img src="https://avatars.githubusercontent.com/u/210795642?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/83810621?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/176283083?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/88077984?v=4" width="200"> |
 | [한나영](https://github.com/nyoeng) | [유지오](https://github.com/yu-jio) | [노현경](https://github.com/getOffWork102) | [진유민](https://github.com/min212) |
 | 플랫폼SW & 데이터과학전공 24학번 | 플랫폼SW & 데이터과학전공 21학번 | 글로벌SW전공 23학번 | 인공지능컴퓨팅전공 24학번 |
-| AI WebSocket 실시간 연동<br/>UI/UX 설계<br/>백엔드 API 연동<br/>Vercel 배포 | 마이페이지 구현<br/>백엔드 API 연동<br/>발표/면접 기록 구현<br/>결과 시각화 구현 | Spring Boot 서버 구축<br/>REST API 설계 및 구현<br/>AWS EC2/S3/RDS 인프라<br/>하이브리드 통신 아키텍처 |  Faster-Whisper / librosa 기반 음성 분석 모델 구현<br/>MediaPipe 기반 시선/제스처 분석 모델 구현<br/>sentence-transformers 대본 유사도 분석 모델 구현<br/>AI 서버(FastAPI + WebSocket) 구축<br/>EC2 배포 및 메모리 최적화 |
+| 사용자 친화 UI/UX 디자인<br/>AI Websocket & 백엔드 통신<br/>Vercel 웹 배포<br/>fetch 기반 API 공통 구조 구축<br/>로그인/회원가입 & 면접/발표 준비 & 녹화 & 결과 화면 구현 및 API 연동 | 마이페이지 구현 및 API 연동<br/>발표/면접 기록 구현 및 API 연동<br/>결과 시각화 화면 API 연동<br/>발표/면접 연습 통계 화면 API 연동 | Spring Boot 서버 구축<br/>REST API 설계 및 구현<br/>AWS EC2/S3/RDS 인프라<br/>하이브리드 통신 아키텍처<br/>llm 프롬프팅(대본 생성/첨삭, 총평, 요약, 꼬리질문) |  Faster-Whisper / librosa 기반 음성 분석 모델 구현<br/>MediaPipe 기반 시선/제스처 분석 모델 구현<br/>sentence-transformers 대본 유사도 분석 모델 구현<br/>AI 서버(FastAPI + WebSocket) 구축<br/>EC2 배포 및 메모리 최적화 |
