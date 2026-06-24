@@ -2,7 +2,6 @@
 
 <p align="center">
   <img width="4186" height="2586" alt="Device - Macbook Pro-3" src="https://github.com/user-attachments/assets/3d0f2ee6-e033-4884-9a44-902023a16b22" />
-
 </p>
 
 > **발표와 면접을 실전처럼 연습하고, AI를 통해 발화 속도·시선·제스처까지 피드백받을 수 있는 훈련 서비스**
@@ -11,9 +10,30 @@
 
 <br />
 
+## 🏆 수상 이력
+
+* **2026 한국정보기술학회 하계 종합학술대회 — 동상 수상**
+  * 논문: *AI 기반 모의 면접/발표 도우미 웹 서비스 개발을 위한 실시간 비언어적 분석 AI 서버 및 백엔드 시스템 설계*
+  * 2026 한국정보기술학회 하계 종합학술대회 논문집
+
+---
+
 ## 🔗 프로젝트 링크
 
 * **배포 주소**: https://2026-capstone-design-project1-team3.vercel.app/
+
+## 📖 프로젝트 위키
+
+프로젝트 설계·기록·회의록 등 상세 문서는 위키에서 확인할 수 있어요.
+
+| 바로가기 | 내용 |
+| --- | --- |
+| [📖 위키 홈](https://github.com/2026-Capstone-Design-Project1-Team3/FE/wiki) | 위키 전체 길잡이 |
+| [📌 Git 전략 / 팀 규칙](https://github.com/2026-Capstone-Design-Project1-Team3/FE/wiki/Onboarding%E2%80%90Git%E2%80%90Strategy) | 브랜치·커밋·PR 컨벤션 |
+| [📐 시스템 아키텍처](https://github.com/2026-Capstone-Design-Project1-Team3/FE/wiki/Docs%E2%80%90Architecture) | 전체 구조 및 통신 흐름 |
+| [🤖 AI 모델 문서](https://github.com/2026-Capstone-Design-Project1-Team3/FE/wiki/Docs%E2%80%90AI%E2%80%90Models) | 비언어 분석 모델 4종 |
+| [📝 트러블슈팅](https://github.com/2026-Capstone-Design-Project1-Team3/FE/wiki/Log%E2%80%90Troubleshooting) | 이슈 및 해결 기록 |
+| [🗣️ 회의록](https://github.com/2026-Capstone-Design-Project1-Team3/FE/wiki/Meeting%E2%80%90Team) | 팀·멘토링 회의 기록 |
 
 ---
 
@@ -59,8 +79,6 @@
 
 <p align="center">
   <img width="4186" height="2586" alt="d" src="https://github.com/user-attachments/assets/39c47968-a992-4c32-8cc4-2cd06e1a280d" />
-
-
 </p>
 
 ---
@@ -90,7 +108,6 @@
 
 <p align="center">
  <img width="4186" height="2586" alt="Device - Macbook Pro-1" src="https://github.com/user-attachments/assets/47dac2e1-a5a0-494a-bfe8-928aa321e0dd" />
-
 </p>
 
 ---
@@ -136,7 +153,6 @@
 
 <p align="center">
   <img width="4186" height="2586" alt="Device - Macbook Pro" src="https://github.com/user-attachments/assets/4a173914-b2e2-467d-bb26-24df4efbd827" />
-
 </p>
 
 ---
