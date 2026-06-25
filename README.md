@@ -17,6 +17,9 @@
   * 2026 한국정보기술학회 하계 종합학술대회 논문집
 
 ---
+## 시연 영상
+
+https://github.com/user-attachments/assets/36c6e427-0e97-4be9-8c7d-dcac3f44d085
 
 ## 🔗 프로젝트 링크
 
